@@ -5,70 +5,52 @@
       <h1>Bandeja técnica</h1>
     </div>
   </div>
-  <div class="split">
-    <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head">
-          <h3>Sin asignar</h3>
-          <span class="chip">{{ pool().length }}</span>
-        </div>
-        <div class="table">
-          <div class="thead cols-inbox"><span>Proyecto</span><span>Cliente</span><span>SLA</span><span>Complejidad</span><span></span></div>
-          @if (!pool().length) {
-            <div class="trow static cols-inbox"><span class="muted">No hay solicitudes sin ingeniero.</span><span></span><span></span><span></span><span></span></div>
-          }
-          @for (q of pool(); track q.id) {
-            <div class="trow static cols-inbox">
-              <div>
-                <strong>{{ q.name }}</strong>
-                <div class="muted">{{ q.vendedor }}</div>
-              </div>
-              <div>{{ q.cliente }}</div>
-              <div class="num">{{ sla(q.id) }}</div>
-              <div>{{ tier(q.id) }}</div>
-              <div>
-                <button class="btn btn-sm" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Ver</button>
-                <button class="btn btn-sm btn-primary" type="button" (click)="take(q.id)"><app-icon name="take" size="sm" /> Tomar</button>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Mis cotizaciones</h3>
-          <span class="chip">{{ mine().length }}</span>
-        </div>
-        <div class="table">
-          <div class="thead cols-inbox"><span>Proyecto</span><span>Cliente</span><span>Estado</span><span></span><span></span></div>
-          @if (!mine().length) {
-            <div class="trow static cols-inbox"><span class="muted">No tiene cotizaciones asignadas.</span><span></span><span></span><span></span><span></span></div>
-          }
-          @for (q of mine(); track q.id) {
-            <div class="trow static cols-inbox">
-              <div><strong>{{ q.name }}</strong></div>
-              <div>{{ q.cliente }}</div>
-              <div><span [class]="statusClass(q.estado)">{{ q.estado }}</span></div>
-              <div></div>
-              <div><button class="btn btn-sm btn-primary" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Abrir</button></div>
-            </div>
-          }
-        </div>
-      </div>
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head">
+      <h3>Sin asignar</h3>
+      <span class="chip">{{ pool().length }}</span>
     </div>
-    <div class="panel">
-      <div class="panel-head">
-        <h3>Carga por ingeniero</h3>
-      </div>
-      <div class="card" style="border:none;box-shadow:none;border-radius:0">
-        @for (e of engineers(); track e.id) {
-          <div style="margin-bottom:14px">
-            <div style="display:flex;justify-content:space-between"><span>{{ e.name }}</span><span class="num">{{ e.tomadas }}</span></div>
-            <div class="bar" style="margin:6px 0"><span [style.width]="e.pct + '%'"></span></div>
-            <div class="muted">ciclo medio {{ e.avgStr }}</div>
+    <div class="table">
+      <div class="thead cols-inbox"><span>Proyecto</span><span>Cliente</span><span>SLA</span><span>Complejidad</span><span></span></div>
+      @if (!pool().length) {
+        <div class="trow static cols-inbox"><span class="muted">No hay solicitudes sin ingeniero.</span><span></span><span></span><span></span><span></span></div>
+      }
+      @for (q of pool(); track q.id) {
+        <div class="trow static cols-inbox">
+          <div>
+            <strong>{{ q.name }}</strong>
+            <div class="muted">{{ q.vendedor }}</div>
           </div>
-        }
-      </div>
+          <div>{{ q.cliente }}</div>
+          <div class="num">{{ sla(q.id) }}</div>
+          <div>{{ tier(q.id) }}</div>
+          <div>
+            <button class="btn btn-sm" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Ver</button>
+            <button class="btn btn-sm btn-primary" type="button" (click)="take(q.id)"><app-icon name="take" size="sm" /> Tomar</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Mis cotizaciones</h3>
+      <span class="chip">{{ mine().length }}</span>
+    </div>
+    <div class="table">
+      <div class="thead cols-inbox"><span>Proyecto</span><span>Cliente</span><span>Estado</span><span></span><span></span></div>
+      @if (!mine().length) {
+        <div class="trow static cols-inbox"><span class="muted">No tiene cotizaciones asignadas.</span><span></span><span></span><span></span><span></span></div>
+      }
+      @for (q of mine(); track q.id) {
+        <div class="trow static cols-inbox">
+          <div><strong>{{ q.name }}</strong></div>
+          <div>{{ q.cliente }}</div>
+          <div><span [class]="statusClass(q.estado)">{{ q.estado }}</span></div>
+          <div></div>
+          <div><button class="btn btn-sm btn-primary" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Abrir</button></div>
+        </div>
+      }
     </div>
   </div>
 </div>
