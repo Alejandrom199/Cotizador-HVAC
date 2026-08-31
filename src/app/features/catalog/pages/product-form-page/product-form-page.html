@@ -1,0 +1,66 @@
+<div class="page">
+  <p class="crumb"><button type="button" (click)="cancel()">Productos</button> / {{ isNew ? 'Nuevo' : code() }}</p>
+  <div class="page-head">
+    <div>
+      <h1>{{ isNew ? 'Nuevo producto' : 'Editar producto' }}</h1>
+    </div>
+  </div>
+  <div class="card card-lg">
+    <div class="form-block">
+      <div>
+        <label class="field">Código interno</label>
+        <input class="input num" [ngModel]="code()" (ngModelChange)="code.set($event)" [readOnly]="codeLocked()" maxlength="16" />
+      </div>
+      <div>
+        <label class="field">Categoría</label>
+        <select class="select" [ngModel]="cat()" (ngModelChange)="cat.set($event)">
+          @for (c of cats; track c) { <option [value]="c">{{ c }}</option> }
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="field">Nombre del producto</label>
+        <input class="input" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+      </div>
+      <div>
+        <label class="field">Unidad de medida</label>
+        <input class="input" [ngModel]="unit()" (ngModelChange)="unit.set($event)" />
+      </div>
+      <div>
+        <label class="field">Estado</label>
+        <select class="select" [ngModel]="activo() ? '1' : '0'" (ngModelChange)="activo.set($event === '1')">
+          <option value="1">Activo</option>
+          <option value="0">Inactivo</option>
+        </select>
+      </div>
+      <div>
+        <label class="field">Stock</label>
+        <input class="input num" type="number" [ngModel]="stock()" (ngModelChange)="stock.set($event == null || $event === '' ? null : +$event)" />
+      </div>
+      <div>
+        <label class="field">Costo unitario (USD)</label>
+        <input class="input num" type="number" [ngModel]="costo()" (ngModelChange)="costo.set(+$event)" />
+      </div>
+      <div>
+        <label class="field">PVP (USD)</label>
+        <input class="input num" type="number" [ngModel]="pvp()" (ngModelChange)="pvp.set(+$event)" />
+      </div>
+      <div class="span-2">
+        <label class="field">Descripción técnica</label>
+        <textarea class="textarea" [ngModel]="spec()" (ngModelChange)="spec.set($event)"></textarea>
+      </div>
+      <div class="span-2">
+        <label class="field">Imagen</label>
+        <div class="dropzone">
+          <div class="muted"><app-icon name="image" /> {{ imagenUrl() || 'Arrastre un archivo o seleccione (solo referencia en esta fase)' }}</div>
+          <label class="btn btn-sm" style="margin-top:8px"><app-icon name="upload" /> Examinar
+            <input type="file" accept="image/*" hidden (change)="onImage($event)" />
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" type="button" (click)="cancel()"><app-icon name="cancel" /> Cancelar</button>
+      <button class="btn btn-green" type="button" (click)="save()"><app-icon name="save" /> Guardar producto</button>
+    </div>
+  </div>
+</div>

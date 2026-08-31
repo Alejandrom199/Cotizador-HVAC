@@ -1,0 +1,66 @@
+<div class="page">
+  <p class="crumb"><button type="button" (click)="cancel()">Clientes</button> / {{ isNew ? 'Nuevo' : ruc() }}</p>
+  <div class="page-head">
+    <div>
+      <h1>{{ isNew ? 'Nuevo cliente' : 'Editar cliente' }}</h1>
+    </div>
+  </div>
+  <div class="card card-lg">
+    <div class="form-block">
+      <div>
+        <label class="field">RUC</label>
+        <div class="input-row">
+          <app-icon name="id" />
+          <input class="input num" maxlength="13" [ngModel]="ruc()" (ngModelChange)="ruc.set($event)" [readOnly]="rucLocked()" placeholder="1791234567001" />
+        </div>
+      </div>
+      <div>
+        <label class="field">Tipo</label>
+        <select class="select" [ngModel]="type()" (ngModelChange)="type.set($event)">
+          <option value="Jurídica">Jurídica</option>
+          <option value="Natural">Natural</option>
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="field">Razón social / Nombre</label>
+        <div class="input-row">
+          <app-icon name="company" />
+          <input class="input" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+        </div>
+      </div>
+      <div class="span-2">
+        <label class="field">Correo de facturación</label>
+        <div class="input-row">
+          <app-icon name="mail" />
+          <input class="input" type="email" [ngModel]="mail()" (ngModelChange)="mail.set($event)" />
+        </div>
+        <p class="hint">Se enviará una copia del presupuesto al correo ingresado.</p>
+      </div>
+      <div class="span-2">
+        <label class="field">Dirección fiscal / obra</label>
+        <div class="input-row">
+          <app-icon name="address" />
+          <input class="input" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
+        </div>
+      </div>
+      <div>
+        <label class="field">Ciudad</label>
+        <div class="input-row">
+          <app-icon name="city" />
+          <input class="input" [ngModel]="city()" (ngModelChange)="city.set($event)" />
+        </div>
+      </div>
+      <div>
+        <label class="field">Teléfono</label>
+        <div class="input-row">
+          <app-icon name="phone" />
+          <input class="input num" [ngModel]="phone()" (ngModelChange)="phone.set($event)" placeholder="+593" />
+        </div>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" type="button" (click)="cancel()"><app-icon name="cancel" /> Cancelar</button>
+      <button class="btn btn-green" type="button" (click)="save()"><app-icon name="save" /> Guardar cliente</button>
+    </div>
+  </div>
+</div>

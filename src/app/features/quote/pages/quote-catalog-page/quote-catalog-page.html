@@ -1,0 +1,50 @@
+<div class="page">
+  <p class="crumb"><button type="button" (click)="back()">Elementos</button> / Catálogo</p>
+  <div class="page-head">
+    <div>
+      <h1>{{ cat() }}</h1>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="save()"><app-icon name="save" /> Grabar</button>
+  </div>
+  <div class="toolbar">
+    <div class="input-row toolbar-search">
+      <app-icon name="search" />
+      <input class="input" [value]="query()" (input)="query.set($any($event.target).value)" placeholder="Buscar por nombre, código o categoría" />
+    </div>
+  </div>
+  <div class="table">
+    <div class="thead" style="grid-template-columns:2fr 1.4fr .7fr .8fr 1.1fr 70px">
+      <span>Material</span><span>Especificación</span><span>UM</span><span>P. unit</span><span>Cantidad</span><span></span>
+    </div>
+    @for (p of rows(); track p.code) {
+      <div class="trow static" style="grid-template-columns:2fr 1.4fr .7fr .8fr 1.1fr 70px">
+        <div>
+          <strong>{{ p.name }}</strong>
+          <div class="muted num">{{ p.code }} · {{ p.cat }}</div>
+        </div>
+        <div class="muted">{{ p.spec }}</div>
+        <div>{{ p.unit }}</div>
+        <div class="num">{{ money(p.pvp) }}</div>
+        <div>
+          @if (p.cat === 'Equipos') {
+            <button class="btn btn-sm" type="button" (click)="bump(p.code, -1)"><app-icon name="minus" size="sm" /></button>
+            <input class="input num" style="width:64px;display:inline-block" type="number" [ngModel]="qty(p.code)" (ngModelChange)="setQty(p.code, +$event)" />
+            <button class="btn btn-sm" type="button" (click)="bump(p.code, 1)"><app-icon name="plus" size="sm" /></button>
+          } @else {
+            <input class="input num" style="width:80px" type="number" [ngModel]="qty(p.code)" (ngModelChange)="setQty(p.code, +$event)" />
+          }
+          @if (p.stock != null) {
+            <span [class]="stockClass(p.stock)" style="margin-left:6px">{{ p.stock }}</span>
+          }
+        </div>
+        <div>
+          @if (selected(p.code)) {
+            <span class="stock ok">En lista</span>
+          } @else {
+            <button class="btn btn-sm btn-primary" type="button" (click)="add(p.code)"><app-icon name="plus" /></button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

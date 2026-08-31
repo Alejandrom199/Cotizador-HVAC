@@ -1,0 +1,31 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Catálogo</div>
+      <h1>Clientes</h1>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="create()"><app-icon name="add" /> Nuevo cliente</button>
+  </div>
+  <div class="toolbar">
+    <div class="input-row toolbar-search">
+      <app-icon name="search" />
+      <input class="input" [value]="query()" (input)="query.set($any($event.target).value)" placeholder="Buscar por RUC, razón social o correo" />
+    </div>
+  </div>
+  <div class="table">
+    <div class="thead cols-cli"><span>Razón social</span><span>RUC</span><span>Correo</span><span>Teléfono</span><span>Ciudad</span><span></span></div>
+    @for (c of rows(); track c.ruc) {
+      <div class="trow cols-cli static">
+        <div>
+          <strong>{{ c.name }}</strong>
+          <div class="muted">{{ c.direccion }}</div>
+        </div>
+        <div class="num">{{ c.ruc }}</div>
+        <div>{{ c.mail }}</div>
+        <div class="num">{{ c.phone }}</div>
+        <div>{{ c.city }}</div>
+        <div><button class="btn btn-sm" type="button" (click)="edit(c.ruc)"><app-icon name="edit" size="sm" /> Editar</button></div>
+      </div>
+    }
+  </div>
+</div>

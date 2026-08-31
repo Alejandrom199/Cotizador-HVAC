@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Operación</div>
+      <h1>Solicitudes</h1>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="startNew()"><app-icon name="add" /><span>{{ newLabel() }}</span></button>
+  </div>
+  <div class="filters">
+    @for (f of counts(); track f.label) {
+      <button class="chip-btn" [class.on]="filter() === f.label" type="button" (click)="filter.set(f.label)">
+        {{ f.label }} <span class="num">{{ f.count }}</span>
+      </button>
+    }
+  </div>
+  <div class="table">
+    <div class="thead cols-sol"><span>Proyecto</span><span>Cliente</span><span>Tipo</span><span>Estado / etapa</span><span style="text-align:right">Monto</span><span></span></div>
+    @for (q of rows(); track q.id) {
+      <div class="trow cols-sol" (click)="open(q.id)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span [class]="priorityClass(q.prio)"></span>
+          <div style="min-width:0">
+            <div class="ellipsis">{{ q.name }}</div>
+            <div class="muted" style="font-size:12px"><span class="num">{{ q.code }}</span> · {{ q.fecha }} · <span class="num">{{ area(q) }}</span></div>
+          </div>
+        </div>
+        <div>{{ q.cliente }}</div>
+        <div>{{ kindTag(q.tipo) }}</div>
+        <div>
+          <span [class]="statusClass(q.estado)">{{ q.estado }}</span>
+          <div class="etapa-dots">
+            @for (n of [1,2,3,4]; track n) {
+              <span [class.on]="n <= q.etapa" [class.lost]="q.estado === 'Perdida' && n <= q.etapa"></span>
+            }
+          </div>
+        </div>
+        <div class="num" style="text-align:right">{{ money(q) }}</div>
+        <div><app-icon name="view" size="sm" /></div>
+      </div>
+    }
+  </div>
+</div>

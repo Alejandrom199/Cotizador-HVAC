@@ -1,0 +1,30 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Cierre</div>
+      <h1>Proyectos finalizados</h1>
+    </div>
+  </div>
+  <p class="muted" style="margin:-8px 0 16px">Cotizaciones enviadas o aprobadas. El envío registra el correo del cliente (sin SMTP en esta fase).</p>
+  <div class="table">
+    <div class="thead cols-fin"><span>Proyecto</span><span>Cliente</span><span>Estado</span><span>Total</span><span>Correo</span><span></span></div>
+    @for (q of rows(); track q.id) {
+      <div class="trow cols-fin static">
+        <div>
+          <strong>{{ q.name }}</strong>
+          <div class="muted num">{{ q.code }}</div>
+        </div>
+        <div>{{ q.cliente }}</div>
+        <div><span [class]="statusClass(q.estado)">{{ q.estado }}</span></div>
+        <div class="num">{{ money(q) }}</div>
+        <div>{{ mail(q) }}</div>
+        <div>
+          <button class="btn btn-sm" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Ver</button>
+          <button class="btn btn-sm btn-primary" type="button" (click)="send(q.id)"><app-icon name="send" size="sm" /> Enviar</button>
+        </div>
+      </div>
+    } @empty {
+      <div class="trow static cols-fin"><span class="muted">No hay proyectos finalizados.</span><span></span><span></span><span></span><span></span><span></span></div>
+    }
+  </div>
+</div>

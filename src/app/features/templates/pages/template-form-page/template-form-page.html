@@ -1,0 +1,71 @@
+<div class="page">
+  <p class="crumb"><button type="button" (click)="cancel()">Plantillas</button> / {{ isNew ? 'Nuevo' : code() }}</p>
+  <div class="page-head">
+    <div>
+      <h1>{{ isNew ? 'Nueva plantilla' : 'Editar plantilla' }}</h1>
+    </div>
+  </div>
+  <div class="card card-lg">
+    <div class="form-block">
+      <div>
+        <label class="field">Código interno</label>
+        <input class="input num" [ngModel]="code()" (ngModelChange)="code.set($event)" [readOnly]="codeLocked()" maxlength="16" />
+      </div>
+      <div>
+        <label class="field">Ductos</label>
+        <select class="select" [ngModel]="ducto() ? '1' : '0'" (ngModelChange)="ducto.set($event === '1')">
+          <option value="1">Sí</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="field">Nombre de la plantilla</label>
+        <input class="input" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+      </div>
+      <div class="span-2">
+        <label class="field">Descripción</label>
+        <input class="input" [ngModel]="sub()" (ngModelChange)="sub.set($event)" />
+      </div>
+      <div>
+        <label class="field">Criterio</label>
+        <input class="input" [ngModel]="driver()" (ngModelChange)="driver.set($event)" />
+      </div>
+      <div>
+        <label class="field">Factor BTU/m²</label>
+        <input class="input num" type="number" [ngModel]="factorBtu()" (ngModelChange)="factorBtu.set(+$event)" />
+      </div>
+      <div class="span-2">
+        <label class="field">Líneas de catálogo</label>
+        <div class="table" style="box-shadow:none;margin-top:8px">
+          <div class="thead" style="grid-template-columns: 110px 1fr 36px">
+            <span>Código</span><span>Ítem</span><span></span>
+          </div>
+          @for (code of items(); track code) {
+            <div class="trow static" style="grid-template-columns: 110px 1fr 36px">
+              <span class="num">{{ code }}</span>
+              <span>{{ itemLabel(code) }}</span>
+              <button class="btn btn-ghost" type="button" (click)="removeItem(code)"><app-icon name="trash" size="sm" /></button>
+            </div>
+          }
+          @if (!items().length) {
+            <div class="trow static" style="grid-template-columns: 1fr">
+              <span class="muted">Sin líneas. Agregue insumos, equipos o mano de obra desde el catálogo.</span>
+            </div>
+          }
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <select class="select" style="flex:1" [ngModel]="pickCode()" (ngModelChange)="pickCode.set($event)">
+            @for (p of available(); track p.code) {
+              <option [value]="p.code">{{ p.code }} · {{ p.name }}</option>
+            }
+          </select>
+          <button class="btn" type="button" [disabled]="!pickCode()" (click)="addItem()"><app-icon name="add" /> Agregar</button>
+        </div>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" type="button" (click)="cancel()"><app-icon name="cancel" /> Cancelar</button>
+      <button class="btn btn-green" type="button" (click)="save()"><app-icon name="save" /> Guardar plantilla</button>
+    </div>
+  </div>
+</div>

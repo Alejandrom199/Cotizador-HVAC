@@ -1,0 +1,45 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Operación</div>
+      <h1>Analítica</h1>
+    </div>
+  </div>
+  <div class="kpis">
+    @for (k of vm().kpis; track k.label) {
+      <div class="card">
+        <div class="kpi-head">
+          <span class="kpi-label">{{ k.label }}</span>
+          <div class="kpi-ico"><app-icon [name]="k.icon" /></div>
+        </div>
+        <div class="num kpi-value">{{ k.value }}</div>
+        <div class="kpi-sub">{{ k.sub }}</div>
+      </div>
+    }
+  </div>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head"><h3>Embudo</h3></div>
+      <div class="card" style="border:none;box-shadow:none;border-radius:0">
+        @for (f of vm().funnel; track f.label) {
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span>{{ f.label }}</span><span class="num">{{ f.count }}</span></div>
+            <div class="bar"><span [style.width]="f.pct"></span></div>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Motivo de pérdida</h3></div>
+      <div class="card" style="border:none;box-shadow:none;border-radius:0">
+        @for (m of vm().motivos; track m.label) {
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--em-line)"><span>{{ m.label }}</span><span class="num">{{ m.count }}</span></div>
+        } @empty { <p class="muted">Sin pérdidas registradas</p> }
+        <h3 style="margin:16px 0 10px">Margen por tipo</h3>
+        @for (t of vm().tipos; track t.label) {
+          <div style="margin-bottom:8px"><div>{{ t.label }} · {{ t.margen }}</div><div class="bar"><span [style.width]="t.pct"></span></div></div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

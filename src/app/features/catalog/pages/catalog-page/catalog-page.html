@@ -1,0 +1,46 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Catálogo</div>
+      <h1>Productos</h1>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="create()"><app-icon name="add" /> Nuevo producto</button>
+  </div>
+  <div class="toolbar">
+    <div class="input-row toolbar-search">
+      <app-icon name="search" />
+      <input class="input" [value]="query()" (input)="query.set($any($event.target).value)" placeholder="Buscar por nombre, código o especificación" />
+    </div>
+  </div>
+  <div class="filters">
+    @for (c of counts(); track c.label) {
+      <button class="chip-btn" [class.on]="filter() === c.label" type="button" (click)="filter.set(c.label)">{{ c.label }} <span class="num">{{ c.count }}</span></button>
+    }
+  </div>
+  <div class="table">
+    <div class="thead cols-cat"><span>Ítem</span><span>Categoría</span><span>UM</span><span>Costo</span><span>PVP</span><span>Stock</span><span>Estado</span><span></span></div>
+    @for (p of rows(); track p.code) {
+      <div class="trow cols-cat static">
+        <div>
+          <strong>{{ p.name }}</strong>
+          <div class="muted num">{{ p.code }} · {{ p.spec }}</div>
+        </div>
+        <div>{{ p.cat }}</div>
+        <div>{{ p.unit }}</div>
+        <div class="num">{{ money(p.costo) }}</div>
+        <div class="num">{{ money(p.pvp) }}</div>
+        <div>
+          @if (p.stock == null) { <span class="muted">—</span> }
+          @else { <span [class]="stockClass(p.stock)">{{ p.stock }}</span> }
+        </div>
+        <div>{{ p.activo ? 'Activo' : 'Inactivo' }}</div>
+        <div>
+          <button class="btn btn-sm" type="button" (click)="edit(p.code)"><app-icon name="edit" size="sm" /> Editar</button>
+          <button class="btn btn-sm btn-ghost" type="button" (click)="toggle(p.code, p.activo)">
+            <app-icon [name]="p.activo ? 'deactivate' : 'activate'" size="sm" /> {{ p.activo ? 'Inactivar' : 'Activar' }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

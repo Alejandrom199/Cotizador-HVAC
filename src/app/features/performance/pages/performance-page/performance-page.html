@@ -1,0 +1,46 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Ingeniería</div>
+      <h1>Rendimiento</h1>
+    </div>
+  </div>
+  <div class="kpis">
+    @for (k of vm().kpis; track k.label) {
+      <div class="card">
+        <div class="kpi-head">
+          <span class="kpi-label">{{ k.label }}</span>
+          <div class="kpi-ico"><app-icon [name]="k.icon" /></div>
+        </div>
+        <div class="num kpi-value">{{ k.value }}</div>
+        <div class="kpi-sub">{{ k.sub }}</div>
+      </div>
+    }
+  </div>
+  <div class="split">
+    <div class="panel">
+      <div class="panel-head"><h3>Vendedores</h3></div>
+      <div class="card" style="border:none;box-shadow:none;border-radius:0">
+        @for (s of vm().sellers; track s.id) {
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--em-line)">
+            <span>{{ s.name }}</span><span class="num">{{ s.won }}/{{ s.n }} · {{ s.val }}</span>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Ingenieros</h3></div>
+      <div class="card" style="border:none;box-shadow:none;border-radius:0">
+        @for (e of vm().engineers; track e.id) {
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--em-line)">
+            <span>{{ e.name }}</span><span class="num">{{ e.n }} · SLA {{ e.sla }}</span>
+          </div>
+        }
+        <h3 style="margin:16px 0 10px">Tiempo por etapa</h3>
+        @for (e of vm().etapas; track e.name) {
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span>{{ e.name }}</span><span class="num">{{ e.avg }}</span></div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Operación</div>
+      <h1>Compras / Bodega</h1>
+    </div>
+  </div>
+  @if (!rows().length) {
+    <div class="message-strip"><div class="k"><app-icon name="info" size="sm" /> Sin requerimientos</div><p>No hay proyectos aprobados con requerimientos de compra.</p></div>
+  }
+  @for (q of rows(); track q.id) {
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-head">
+        <div>
+          <h3>{{ q.name }}</h3>
+          <div class="muted num">{{ q.code }} · {{ q.cliente }}</div>
+        </div>
+        <button class="btn btn-primary btn-sm" type="button" (click)="workspace.generatePurchaseOrder()"><app-icon name="warehouse" /> Generar OC</button>
+      </div>
+      <div class="table">
+        <div class="thead" style="grid-template-columns:2fr 1fr 1fr 1fr"><span>Ítem</span><span>Requerido</span><span>Stock</span><span>Disponibilidad</span></div>
+        @for (i of itemsOf(q.id); track i.name) {
+          <div class="trow static" style="grid-template-columns:2fr 1fr 1fr 1fr">
+            <span>{{ i.name }}</span>
+            <span class="num">{{ i.req }}</span>
+            <span class="num">{{ i.stock }}</span>
+            <span [class]="i.cls">{{ i.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

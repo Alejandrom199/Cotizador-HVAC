@@ -1,0 +1,160 @@
+<div class="page">
+  <p class="crumb"><button type="button" (click)="back()">← Solicitudes</button></p>
+  <div class="page-head">
+    <div>
+      <h1>Nueva solicitud de cotización</h1>
+      <p class="muted" style="margin-top:4px;max-width:640px">Complete los detalles técnicos y comerciales para generar una propuesta precisa de climatización industrial.</p>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <div class="card card-lg form-card">
+      <div class="section-title"><app-icon name="company" size="sm" /> Datos del cliente</div>
+      <div class="two">
+        <div>
+          <label class="field">RUC de la empresa</label>
+          <div class="input-row">
+            <app-icon name="id" />
+            <input class="num" maxlength="13" [ngModel]="ruc()" (ngModelChange)="onRuc($event)" placeholder="1791234567001" />
+            @if (ruc().length === 13) {
+              <span class="stock" [class.ok]="rucOk()" [class.warn]="!rucOk()">{{ rucOk() ? 'Registrado' : 'No registrado' }}</span>
+            }
+          </div>
+        </div>
+        <div style="position:relative">
+          <label class="field">Nombre de empresa</label>
+          <div class="input-row">
+            <app-icon name="search" />
+            <input class="input" [ngModel]="cliente()" (ngModelChange)="onCliente($event)" placeholder="Buscar o crear empresa..." />
+          </div>
+          @if (hits().length) {
+            <div class="card" style="position:absolute;left:0;right:0;z-index:8;padding:0">
+              @for (h of hits(); track h.ruc) {
+                <button type="button" class="btn btn-ghost" style="display:block;width:100%;padding:10px 12px;text-align:left" (click)="pick(h)">
+                  {{ h.name }}<br /><span class="num muted">RUC {{ h.ruc }} · {{ h.city }}</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      @if (noHit()) {
+        <div class="message-strip warn" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <p style="margin:0">El cliente no está registrado. Debe darlo de alta para iniciar la cotización.</p>
+          <button class="btn btn-sm btn-primary" type="button" (click)="showNewCli.set(true); ncRuc.set(ruc()); ncName.set(cliente())"><app-icon name="register" /> Registrar cliente</button>
+        </div>
+      }
+      <div style="margin-top:16px">
+        <label class="field">Nombre del proyecto</label>
+        <div class="input-row">
+          <app-icon name="requests" />
+          <input class="input" [ngModel]="proyecto()" (ngModelChange)="proyecto.set($event)" placeholder="Cotización de Climatización Afecor" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-lg form-card">
+      <div class="section-title"><app-icon name="files" size="sm" /> Carga de archivos</div>
+      <div class="dropzone dropzone-fill">
+        <app-icon name="upload" size="lg" />
+        <div style="margin-top:8px;font-weight:600">Subir planos o documentos técnicos</div>
+        <div class="muted" style="margin:4px 0 12px">Formatos: PDF, DWG, JPG (máx. 10 MB)</div>
+        <label class="btn btn-sm"><app-icon name="upload" /> Examinar archivos
+          <input type="file" multiple accept=".pdf,.dwg,.jpg,.jpeg,.png" hidden (change)="onFiles($event)" />
+        </label>
+      </div>
+      @for (f of files(); track f.id) {
+        <div class="file-row">
+          <span class="file-ext">{{ f.ext }}</span>
+          <span class="ellipsis">{{ f.name }}</span>
+          <button class="btn btn-ghost" type="button" (click)="files.update(list => list.filter(x => x.id !== f.id))"><app-icon name="trash" size="sm" /></button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card card-lg" style="margin-top:16px">
+    <div class="section-title"><app-icon name="user" size="sm" /> Detalle técnico de cotización</div>
+    <div class="tech-split">
+      <div>
+        <div class="tech-col-title">¿Qué servicio requiere?</div>
+        <div class="svc-grid">
+          <button type="button" class="svc-pick" [class.on]="tipo() === QuoteKind.Instalacion" (click)="setTipo(QuoteKind.Instalacion)">
+            <app-icon name="install" />
+            <span>Instalación</span>
+          </button>
+          <button type="button" class="svc-pick" [class.on]="tipo() === QuoteKind.Mantenimiento" (click)="setTipo(QuoteKind.Mantenimiento)">
+            <app-icon name="maintain" />
+            <span>Mantenimiento</span>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div class="tech-col-title">{{ tipo() === QuoteKind.Instalacion ? 'Opciones de instalación' : 'Opciones de mantenimiento' }}</div>
+        <div class="opt-list">
+          @for (opt of currentOptions(); track opt.id) {
+            <button type="button" class="opt-pick" [class.on]="subtipo() === opt.id" (click)="subtipo.set(opt.id)">
+              <app-icon class="opt-ico" [name]="opt.icon" />
+              <span>{{ opt.label }}</span>
+              @if (subtipo() === opt.id) {
+                <app-icon class="opt-check" name="check" />
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-lg" style="margin-top:16px">
+    <div class="section-title"><app-icon name="info" size="sm" /> Información adicional</div>
+    <div class="extra-grid">
+      <div>
+        <label class="field">Prioridad</label>
+        <div class="input-row">
+          <app-icon name="warn" />
+          <select class="select" [ngModel]="prio()" (ngModelChange)="prio.set($event)">
+            <option [value]="Priority.Alta">Alta</option>
+            <option [value]="Priority.Media">Media</option>
+            <option [value]="Priority.Baja">Baja</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="field">Observaciones</label>
+        <textarea class="textarea" [ngModel]="observaciones()" (ngModelChange)="observaciones.set($event)" placeholder="Escriba aquí cualquier detalle o requerimiento especial..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn btn-ghost" type="button" (click)="back()"><app-icon name="cancel" /> Cancelar</button>
+    <button class="btn" type="button" (click)="exportPdf()"><app-icon name="pdf" /> Exportar PDF</button>
+    <button class="btn btn-primary" type="button" (click)="submit()"><app-icon name="finalize" /> Finalizar solicitud</button>
+  </div>
+
+  @if (showNewCli()) {
+    <div class="modal-back" (click)="showNewCli.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Registrar cliente</h3>
+        <label class="field" style="margin-top:16px">RUC</label>
+        <div class="input-row"><app-icon name="id" /><input class="input num" [ngModel]="ncRuc()" (ngModelChange)="ncRuc.set($event)" maxlength="13" /></div>
+        <label class="field" style="margin-top:12px">Razón social</label>
+        <div class="input-row"><app-icon name="company" /><input class="input" [ngModel]="ncName()" (ngModelChange)="ncName.set($event)" /></div>
+        <label class="field" style="margin-top:12px">Dirección</label>
+        <div class="input-row"><app-icon name="address" /><input class="input" [ngModel]="ncDir()" (ngModelChange)="ncDir.set($event)" /></div>
+        <label class="field" style="margin-top:12px">Ciudad</label>
+        <div class="input-row"><app-icon name="city" /><input class="input" [ngModel]="ncCity()" (ngModelChange)="ncCity.set($event)" /></div>
+        <label class="field" style="margin-top:12px">Teléfono</label>
+        <div class="input-row"><app-icon name="phone" /><input class="input num" [ngModel]="ncPhone()" (ngModelChange)="ncPhone.set($event)" placeholder="+593" /></div>
+        <label class="field" style="margin-top:12px">Correo de facturación</label>
+        <div class="input-row"><app-icon name="mail" /><input class="input" [ngModel]="ncMail()" (ngModelChange)="ncMail.set($event)" /></div>
+        <p class="hint">Se enviará una copia del presupuesto al correo ingresado.</p>
+        <div class="actions-row">
+          <button class="btn" type="button" (click)="showNewCli.set(false)"><app-icon name="cancel" /> Cancelar</button>
+          <button class="btn btn-primary" type="button" (click)="saveClient()"><app-icon name="save" /> Guardar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

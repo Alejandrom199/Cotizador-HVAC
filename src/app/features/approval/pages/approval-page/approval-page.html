@@ -1,0 +1,30 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Gerencia</div>
+      <h1>Aprobación de solicitud</h1>
+    </div>
+  </div>
+  <p class="muted" style="margin:-8px 0 16px">Ingeniería ya cerró el cálculo. La aprobación deja la cotización lista para que Ventas la envíe al cliente.</p>
+  <div class="table">
+    <div class="thead cols-fin"><span>Proyecto</span><span>Cliente</span><span>Estado</span><span>Total</span><span>Ingeniero</span><span></span></div>
+    @for (q of rows(); track q.id) {
+      <div class="trow cols-fin static">
+        <div>
+          <strong>{{ q.name }}</strong>
+          <div class="muted num">{{ q.code }}</div>
+        </div>
+        <div>{{ q.cliente }}</div>
+        <div><span [class]="statusClass(q.estado)">{{ q.estado }}</span></div>
+        <div class="num">{{ money(q) }}</div>
+        <div>{{ q.ingeniero || '—' }}</div>
+        <div>
+          <button class="btn btn-sm" type="button" (click)="open(q.id)"><app-icon name="view" size="sm" /> Ver</button>
+          <button class="btn btn-sm btn-green" type="button" (click)="approve(q.id)"><app-icon name="approve" size="sm" /> Aprobar</button>
+        </div>
+      </div>
+    } @empty {
+      <div class="trow static cols-fin"><span class="muted">No hay solicitudes pendientes de aprobación.</span><span></span><span></span><span></span><span></span><span></span></div>
+    }
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <app-icon name="brand" />
+      </div>
+      <div>
+        <div class="brand-title">Cotizador HVAC</div>
+        <div class="brand-sub">EMASESOR · ECUADOR</div>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="role-switch">
+      <span>ROL</span>
+      @for (r of roles; track r.id) {
+        <button
+          class="role-btn"
+          [class.on]="session.role() === r.id"
+          type="button"
+          [title]="r.label"
+          [attr.aria-label]="r.label"
+          (click)="setRole(r.id)"
+        >
+          <app-icon [name]="r.icon" />
+        </button>
+      }
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;padding-left:6px">
+      <div class="iva-chip"><app-icon name="percent" size="sm" /><span>IVA</span><span class="num">{{ iva() }}%</span></div>
+      <div class="who">
+        <div class="avatar">{{ initials() }}</div>
+        <div>
+          <div style="font-size:12px;font-weight:600">{{ profile().name }}</div>
+          <div class="muted-name">{{ profile().label }}</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <nav class="side">
+      @for (g of nav(); track g.label) {
+        <div class="nav-label">{{ g.label }}</div>
+        @for (item of g.items; track item.href) {
+          <a class="nav-btn" [href]="item.href" [class.on]="isOn(item.href)" (click)="go($event, item.href)">
+            <app-icon [name]="item.icon" />
+            <span>{{ item.label }}</span>
+            @if (item.badge === 'sol') {
+              <span class="badge">{{ solCount() }}</span>
+            }
+            @if (item.badge === 'pool') {
+              <span class="badge pool">{{ poolCount() }}</span>
+            }
+            @if (item.badge === 'appr') {
+              <span class="badge pool">{{ approvalCount() }}</span>
+            }
+            @if (item.badge === 'send') {
+              <span class="badge">{{ sendCount() }}</span>
+            }
+          </a>
+        }
+      }
+    </nav>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+  @if (toast.message(); as msg) {
+    <div class="toast">{{ msg }}</div>
+  }
+</div>

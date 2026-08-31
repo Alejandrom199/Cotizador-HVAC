@@ -1,0 +1,46 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Catálogo</div>
+      <h1>Plantillas</h1>
+      <p class="muted" style="margin-top:4px">Cada plantilla se puede modificar o clonar para armar una variante.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" type="button" (click)="fileInput.click()"><app-icon name="upload" /> Cargar plantilla</button>
+      <input #fileInput type="file" accept="application/json,.json" hidden (change)="loadFile($event)" />
+      <button class="btn btn-primary" type="button" (click)="create()"><app-icon name="add" /> Nuevo</button>
+    </div>
+  </div>
+
+  <div class="tpl-grid">
+    @for (t of rows(); track t.code) {
+      <div class="card card-lg tpl-card">
+        <div class="section-title"><app-icon name="templates" size="sm" /> {{ t.code }}</div>
+        <h3>{{ t.name }}</h3>
+        <p class="muted" style="margin-top:4px">{{ t.sub }}</p>
+        <div class="kv-list" style="margin-top:16px">
+          <div>
+            <div class="k">Criterio</div>
+            <div class="v">{{ t.driver }}</div>
+          </div>
+          <div>
+            <div class="k">Factor</div>
+            <div class="v num">{{ t.factorBtu || '—' }} BTU/m²</div>
+          </div>
+          <div>
+            <div class="k">Ductos</div>
+            <div class="v">{{ t.ducto ? 'Sí' : 'No' }}</div>
+          </div>
+          <div>
+            <div class="k">Líneas</div>
+            <div class="v num">{{ t.items.length }}</div>
+          </div>
+        </div>
+        <div class="tpl-actions">
+          <button class="btn" type="button" (click)="edit(t.code)"><app-icon name="edit" /> Modificar</button>
+          <button class="btn btn-ghost" type="button" (click)="clone(t.code)"><app-icon name="clone" /> Clonar</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
