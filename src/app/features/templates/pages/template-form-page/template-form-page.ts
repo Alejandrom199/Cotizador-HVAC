@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { SystemTemplate } from '@app/domain/models/template.model';
-import { ProductCategory } from '@app/domain/enums/product-category.enum';
+import { ProductCategory, AppRoutes } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 
 export interface TemplateItemView {
@@ -65,7 +65,7 @@ export class TemplateFormPage {
       this.ducto.set(existing.ducto);
       this.items.set([...existing.items]);
     } else if (!this.isNew) {
-      void this.router.navigateByUrl('/plantillas');
+      void this.router.navigateByUrl(AppRoutes.Plantillas);
     }
   }
 
@@ -143,7 +143,7 @@ export class TemplateFormPage {
   }
 
   cancel(): void {
-    void this.router.navigateByUrl('/plantillas');
+    void this.router.navigateByUrl(AppRoutes.Plantillas);
   }
 
   save(): void {
@@ -158,7 +158,7 @@ export class TemplateFormPage {
     };
     const err = this.workspace.saveTemplate(template, this.isNew);
     if (!err) {
-      void this.router.navigateByUrl('/plantillas');
+      void this.router.navigateByUrl(AppRoutes.Plantillas);
     }
   }
 }

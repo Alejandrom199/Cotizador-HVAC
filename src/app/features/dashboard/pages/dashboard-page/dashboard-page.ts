@@ -4,8 +4,7 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { CreateFlowService } from '@app/application/create-flow.service';
 import { homeListPath, isPendingApproval, isPendingSend } from '@app/core/role-access';
 import { SessionService } from '@app/core/session.service';
-import { UserRole } from '@app/domain/enums/user-role.enum';
-import { QuoteStatus } from '@app/domain/enums/quote-status.enum';
+import { UserRole, QuoteStatus, SlaStageName } from '@app/domain/enums';
 import { Quote } from '@app/domain/models/quote.model';
 import { kindTag, statusClass } from '@app/shared/ui/presentation';
 import { Icon, IconName } from '@app/shared/ui/icon';
@@ -104,8 +103,8 @@ export class DashboardPage {
       insightBody = 'Usted crea la solicitud. Ingeniería arma el cálculo, Gerencia aprueba y usted envía la cotización al cliente.';
       dashQuotes = quotes.slice(0, 5);
       const stages: Array<[string, (q: Quote) => boolean, string]> = [
-        ['Solicitud / Elaboración', (x) => ['Solicitud', 'Elaboración'].includes(x.estado), '#0f4c81'],
-        ['Cálculos / Validación', (x) => ['Cálculos', 'Validación'].includes(x.estado), '#0f4c81'],
+        ['Solicitud / Elaboración', (x) => x.estado === QuoteStatus.Solicitud || x.estado === QuoteStatus.Elaboracion, '#0f4c81'],
+        ['Cálculos / Validación', (x) => x.estado === QuoteStatus.Calculos || x.estado === QuoteStatus.Validacion, '#0f4c81'],
         ['Enviada', (x) => x.estado === QuoteStatus.Enviada, '#0f4c81'],
         ['Aprobada', (x) => x.estado === QuoteStatus.Aprobada, '#0f4c81'],
       ];
@@ -116,7 +115,9 @@ export class DashboardPage {
     } else {
       greetKicker = 'Ingeniería';
       greetTitle = 'Inicio';
-      const asignadas = quotes.filter((x) => !['Aprobada', 'Perdida', 'Enviada'].includes(x.estado));
+      const asignadas = quotes.filter(
+        (x) => x.estado !== QuoteStatus.Aprobada && x.estado !== QuoteStatus.Perdida && x.estado !== QuoteStatus.Enviada,
+      );
       kpis = [
         { label: 'Asignadas a mí', value: asignadas.length, sub: 'pendientes', icon: 'inbox' },
         { label: 'En cálculo', value: quotes.filter((x) => x.estado === QuoteStatus.Calculos).length, sub: 'motor HVAC', icon: 'calc' },
@@ -129,10 +130,10 @@ export class DashboardPage {
       insightBody = 'Tome la solicitud en bandeja, complete el cálculo y finalice. Gerencia aprueba y Ventas envía al cliente.';
       dashQuotes = asignadas.slice(0, 5);
       const stages: Array<[string, number, string]> = [
-        ['Revisión', 1, '#0f4c81'],
-        ['Planos', 2, '#0f4c81'],
-        ['Cálculos', 3, '#0f4c81'],
-        ['Cotización', 4, '#0f4c81'],
+        [SlaStageName.Revision, 1, '#0f4c81'],
+        [SlaStageName.Planos, 2, '#0f4c81'],
+        [SlaStageName.Calculos, 3, '#0f4c81'],
+        [SlaStageName.Cotizacion, 4, '#0f4c81'],
       ];
       funnel = stages.map(([label, etapa, color]) => {
         const c = quotes.filter((x) => x.etapa >= etapa).length;

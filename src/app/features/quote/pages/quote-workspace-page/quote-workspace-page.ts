@@ -6,15 +6,10 @@ import { map } from 'rxjs/operators';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { SessionService } from '@app/core/session.service';
 import { homeListPath, isPendingApproval, isPendingSend } from '@app/core/role-access';
-import { UserRole } from '@app/domain/enums/user-role.enum';
-import { ProductCategory } from '@app/domain/enums/product-category.enum';
-import { RoomKind } from '@app/domain/enums/room-kind.enum';
-import { statusClass } from '@app/shared/ui/presentation';
-import { stockClass } from '@app/shared/ui/presentation';
+import { WorkspaceTab, ProductCategory, RoomKind, UserRole, DiscountCategory } from '@app/domain/enums';
+import { statusClass, stockClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
 import { InvestmentSummary } from '@app/shared/ui/investment-summary/investment-summary';
-
-type Tab = 'resumen' | 'calculo' | 'elementos' | 'tiempos' | 'reajuste' | 'informe';
 
 @Component({
   selector: 'app-quote-workspace-page',
@@ -37,6 +32,8 @@ export class QuoteWorkspacePage {
     ProductCategory.Logistica,
   ];
   readonly RoomKind = RoomKind;
+  readonly WorkspaceTab = WorkspaceTab;
+  readonly DiscountCategory = DiscountCategory;
 
   readonly id = toSignal(
     (this.route.parent ?? this.route).paramMap.pipe(map((p) => p.get('id') ?? '')),
@@ -45,7 +42,7 @@ export class QuoteWorkspacePage {
         this.route.parent?.snapshot.paramMap.get('id') ?? this.route.snapshot.paramMap.get('id') ?? '',
     },
   );
-  readonly tab = signal<Tab>('resumen');
+  readonly tab = signal<WorkspaceTab>(WorkspaceTab.Resumen);
 
   /**
    * Flag de control para mostrar/ocultar la pestaña de Elementos en cotizaciones.
@@ -54,25 +51,25 @@ export class QuoteWorkspacePage {
   readonly showElementsTab = signal(false);
 
   readonly availableTabs = computed(() => [
-    { id: 'resumen' as Tab, l: 'Resumen' },
-    { id: 'calculo' as Tab, l: 'Cálculo HVAC' },
-    ...(this.showElementsTab() ? [{ id: 'elementos' as Tab, l: 'Elementos' }] : []),
-    { id: 'tiempos' as Tab, l: 'Tiempos / SLA' },
-    { id: 'reajuste' as Tab, l: 'Reajuste' },
-    { id: 'informe' as Tab, l: 'Informe final' },
+    { id: WorkspaceTab.Resumen, l: 'Resumen' },
+    { id: WorkspaceTab.Calculo, l: 'Cálculo HVAC' },
+    ...(this.showElementsTab() ? [{ id: WorkspaceTab.Elementos, l: 'Elementos' }] : []),
+    { id: WorkspaceTab.Tiempos, l: 'Tiempos / SLA' },
+    { id: WorkspaceTab.Reajuste, l: 'Reajuste' },
+    { id: WorkspaceTab.Informe, l: 'Informe final' },
   ]);
 
   readonly openCats = signal<Record<string, boolean>>({
-    Equipos: true,
-    Insumos: true,
-    'Mano de Obra': false,
-    Logística: false,
+    [ProductCategory.Equipos]: true,
+    [ProductCategory.Insumos]: true,
+    [ProductCategory.ManoDeObra]: false,
+    [ProductCategory.Logistica]: false,
   });
 
   constructor() {
     const tabFromQuery = toSignal(
-      this.route.queryParamMap.pipe(map((p) => p.get('tab') as Tab | null)),
-      { initialValue: this.route.snapshot.queryParamMap.get('tab') as Tab | null },
+      this.route.queryParamMap.pipe(map((p) => p.get('tab') as WorkspaceTab | null)),
+      { initialValue: this.route.snapshot.queryParamMap.get('tab') as WorkspaceTab | null },
     );
     effect(() => {
       const next = tabFromQuery();
@@ -181,8 +178,8 @@ export class QuoteWorkspacePage {
     this.workspace.patchQuote(this.id(), { plantilla: code });
   }
 
-  setTab(id: string): void {
-    this.tab.set(id as Tab);
+  setTab(id: WorkspaceTab | string): void {
+    this.tab.set(id as WorkspaceTab);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: id },

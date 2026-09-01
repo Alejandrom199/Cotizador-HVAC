@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
-import { ProductCategory } from '@app/domain/enums/product-category.enum';
+import { ProductCategory, AppRoutes } from '@app/domain/enums';
 import { Product } from '@app/domain/models/product.model';
 import { Icon } from '@app/shared/ui/icon';
 
@@ -56,7 +56,7 @@ export class ProductFormPage {
   }
 
   cancel(): void {
-    void this.router.navigateByUrl('/productos');
+    void this.router.navigateByUrl(AppRoutes.Productos);
   }
 
   save(): void {
@@ -74,7 +74,7 @@ export class ProductFormPage {
     };
     const err = this.workspace.saveProduct(product, this.isNew);
     if (!err) {
-      void this.router.navigateByUrl('/productos');
+      void this.router.navigateByUrl(AppRoutes.Productos);
     }
   }
 }

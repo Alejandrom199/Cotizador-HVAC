@@ -18,13 +18,20 @@
         <button class="btn btn-primary btn-sm" type="button" (click)="workspace.generatePurchaseOrder()"><app-icon name="warehouse" /> Generar OC</button>
       </div>
       <div class="table">
-        <div class="thead" style="grid-template-columns:2fr 1fr 1fr 1fr"><span>Ítem</span><span>Requerido</span><span>Stock</span><span>Disponibilidad</span></div>
+        <div class="thead" style="grid-template-columns:2fr 1fr 1fr 1.2fr">
+          <span>Ítem</span>
+          <span>Requerido</span>
+          <span>Stock</span>
+          <span style="text-align:center">Disponibilidad</span>
+        </div>
         @for (i of itemsOf(q.id); track i.name) {
-          <div class="trow static" style="grid-template-columns:2fr 1fr 1fr 1fr">
+          <div class="trow static" style="grid-template-columns:2fr 1fr 1fr 1.2fr;align-items:center">
             <span>{{ i.name }}</span>
             <span class="num">{{ i.req }}</span>
             <span class="num">{{ i.stock }}</span>
-            <span [class]="i.cls">{{ i.label }}</span>
+            <div style="display:flex;justify-content:center;align-items:center">
+              <app-pill-badge [tone]="i.tone" [label]="i.label" />
+            </div>
           </div>
         }
       </div>

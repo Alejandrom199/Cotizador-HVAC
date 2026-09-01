@@ -1,21 +1,21 @@
 @if (quote(); as q) {
   <div class="page">
     <p class="crumb"><button type="button" (click)="back()">← {{ listLabel() }}</button></p>
-    <div class="page-head">
-      <div>
+    <div class="page-head" style="align-items:center">
+      <div style="min-width:0;flex:1">
         <h1>{{ q.name }} <span [class]="statusClass(q.estado)" style="margin-left:8px;vertical-align:middle">{{ q.estado }}</span></h1>
         <div class="muted" style="margin-top:6px">
           {{ q.code }} - {{ q.cliente }} | RUC {{ q.ruc }} | {{ q.tipo }} / {{ q.subtipo }} | Asignado a {{ q.asignado || '—' }}
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="actions-row" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;flex-shrink:0">
         @if (canSend()) {
           <button class="btn btn-primary" type="button" (click)="workspace.sendQuote(q.id)"><app-icon name="send" /> Enviar</button>
         }
         @if (canApprove()) {
           <button class="btn btn-green" type="button" (click)="workspace.approveQuote(q.id)"><app-icon name="approve" /> Aprobar</button>
         }
-        <button class="btn" type="button" (click)="clone()"><app-icon name="clone" /> Clonar</button>
+        <button class="btn btn-secondary" type="button" (click)="clone()"><app-icon name="clone" /> Clonar</button>
         <button class="btn btn-dark" type="button" (click)="workspace.exportFinalReport(q.id)"><app-icon name="pdf" /> Exportar PDF</button>
       </div>
     </div>
@@ -70,13 +70,23 @@
         <div class="card card-lg">
           <div class="section-title">Descargar reportes</div>
           <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico completo de ingeniería.</p>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;justify-content:center">
-              <app-icon name="report-final" /> Informe final (PDF)
-            </button>
-            <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;justify-content:center">
-              <app-icon name="report-detail" /> Informe detallado
-            </button>
+          <div class="report-buttons-group" style="display:flex;flex-direction:column;gap:10px;width:100%">
+            <div style="width:100%">
+              <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                  <app-icon name="report-final" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                  <span style="font-weight:600;font-size:13.5px">Informe final (PDF)</span>
+                </span>
+              </button>
+            </div>
+            <div style="width:100%">
+              <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                  <app-icon name="report-detail" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                  <span style="font-weight:600;font-size:13.5px">Informe detallado</span>
+                </span>
+              </button>
+            </div>
           </div>
         </div>
         <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
@@ -276,7 +286,7 @@
                   <span class="field" style="margin:0">Insumos</span>
                   <span class="num disc-val" [class.on]="q.descInsumos !== 0">{{ workspace.discLabel(q.descInsumos) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id, 'descInsumos', $event)" />
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Insumos, $event)" />
                 <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
               </div>
               <div class="card" style="box-shadow:none">
@@ -284,7 +294,7 @@
                   <span class="field" style="margin:0">Equipos</span>
                   <span class="num disc-val" [class.on]="q.descEquipos !== 0">{{ workspace.discLabel(q.descEquipos) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id, 'descEquipos', $event)" />
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Equipos, $event)" />
                 <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
               </div>
               <div class="card" style="box-shadow:none">
@@ -292,7 +302,7 @@
                   <span class="field" style="margin:0">Mano de obra</span>
                   <span class="num disc-val" [class.on]="q.descMO !== 0">{{ workspace.discLabel(q.descMO) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id, 'descMO', $event)" />
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.ManoDeObra, $event)" />
                 <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
               </div>
             </div>
@@ -368,10 +378,9 @@
             </div>
             <p class="muted" style="margin-top:16px">Precio en USD. Incluye IVA {{ iva() }}%. Validez de la oferta: {{ validityDays() }} días. Este informe reemplaza las hojas Excel de propuesta.</p>
           </div>
-          <div class="actions-row" style="justify-content:flex-start">
-            <button class="btn btn-dark" type="button" (click)="workspace.exportFinalReport(q.id)"><app-icon name="pdf" /> Exportar PDF</button>
+          <div class="actions-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px">
             @if (canSend()) {
-              <button class="btn" type="button" (click)="workspace.sendQuote(q.id)"><app-icon name="send" /> Enviar al cliente</button>
+              <button class="btn btn-primary" type="button" (click)="workspace.sendQuote(q.id)"><app-icon name="send" /> Enviar al cliente</button>
             }
             @if (canApprove()) {
               <button class="btn btn-green" type="button" (click)="workspace.approveQuote(q.id)"><app-icon name="approve" /> Aprobar y finalizar</button>
@@ -379,6 +388,8 @@
             @if (canFinalize()) {
               <button class="btn btn-green" type="button" (click)="workspace.finalizeQuote(q.id)"><app-icon name="finalize" /> Finalizar cotización</button>
             }
+            <button class="btn btn-secondary" type="button" (click)="clone()"><app-icon name="clone" /> Clonar</button>
+            <button class="btn btn-dark" type="button" (click)="workspace.exportFinalReport(q.id)"><app-icon name="pdf" /> Exportar PDF</button>
           </div>
         </div>
         <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />

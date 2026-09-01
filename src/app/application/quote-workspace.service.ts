@@ -30,15 +30,20 @@ import {
   promisedDateLabel,
   roomCount,
 } from '../domain/calculators/quote-metrics';
-import { QuoteStatus } from '../domain/enums/quote-status.enum';
-import { QuoteKind, InstallationSubtype } from '../domain/enums/quote-kind.enum';
-import { Priority } from '../domain/enums/priority.enum';
-import { ProductCategory } from '../domain/enums/product-category.enum';
-import { RoomKind } from '../domain/enums/room-kind.enum';
+import {
+  QuoteStatus,
+  QuoteKind,
+  InstallationSubtype,
+  Priority,
+  ProductCategory,
+  RoomKind,
+  UserRole,
+  DiscountCategory,
+  ClientType,
+} from '../domain/enums';
 import { SessionService } from '../core/session.service';
 import { ToastService } from '../core/toast.service';
 import { PrintService } from './print.service';
-import { UserRole } from '../domain/enums/user-role.enum';
 import { isPendingApproval, isPendingSend } from '../core/role-access';
 
 export interface CreateRequestInput {
@@ -591,7 +596,7 @@ export class QuoteWorkspaceService {
     this.quotesRepo.upsert({ ...quote, ...patch });
   }
 
-  setDiscount(id: string, field: 'descInsumos' | 'descEquipos' | 'descMO', value: number): void {
+  setDiscount(id: string, field: DiscountCategory, value: number): void {
     const max = this.settings.maxDiscountPct;
     const clamped = Math.max(-max, Math.min(max, value || 0));
     this.patchQuote(id, { [field]: clamped });

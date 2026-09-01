@@ -1,12 +1,20 @@
-import { UserRole } from '@app/domain/enums/user-role.enum';
-import { QuoteStatus } from '@app/domain/enums/quote-status.enum';
+import { UserRole, QuoteStatus, AppRoutes } from '@app/domain/enums';
 import { IconName } from '@app/shared/ui/icon';
+
+export const NavBadgeType = {
+  Solicitudes: 'sol',
+  Pool: 'pool',
+  Aprobaciones: 'appr',
+  Enviadas: 'send',
+} as const;
+
+export type NavBadgeType = (typeof NavBadgeType)[keyof typeof NavBadgeType];
 
 export interface NavItem {
   href: string;
   icon: IconName;
   label: string;
-  badge?: 'sol' | 'pool' | 'appr' | 'send';
+  badge?: NavBadgeType;
 }
 
 export interface NavGroup {
@@ -14,19 +22,19 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-const INICIO: NavItem = { href: '/inicio', icon: 'home', label: 'Inicio' };
+const INICIO: NavItem = { href: AppRoutes.Inicio, icon: 'home', label: 'Inicio' };
 
 const NAV_BY_ROLE: Record<UserRole, NavGroup[]> = {
   [UserRole.Ingenieria]: [
     {
       label: 'PRINCIPAL',
-      items: [INICIO, { href: '/bandeja', icon: 'inbox', label: 'Bandeja técnica', badge: 'pool' }],
+      items: [INICIO, { href: AppRoutes.Bandeja, icon: 'inbox', label: 'Bandeja técnica', badge: NavBadgeType.Pool }],
     },
     {
       label: 'CATÁLOGO',
       items: [
-        { href: '/productos', icon: 'products', label: 'Productos' },
-        { href: '/plantillas', icon: 'templates', label: 'Plantillas' },
+        { href: AppRoutes.Catalogo, icon: 'products', label: 'Productos' },
+        { href: AppRoutes.Plantillas, icon: 'templates', label: 'Plantillas' },
       ],
     },
   ],
@@ -35,15 +43,15 @@ const NAV_BY_ROLE: Record<UserRole, NavGroup[]> = {
       label: 'PRINCIPAL',
       items: [
         INICIO,
-        { href: '/solicitudes', icon: 'requests', label: 'Solicitudes', badge: 'sol' },
-        { href: '/rendimiento', icon: 'performance', label: 'Rendimiento' },
+        { href: AppRoutes.Solicitudes, icon: 'requests', label: 'Solicitudes', badge: NavBadgeType.Solicitudes },
+        { href: AppRoutes.Metricas, icon: 'performance', label: 'Rendimiento' },
       ],
     },
     {
       label: 'CATÁLOGO',
       items: [
-        { href: '/clientes', icon: 'clients', label: 'Clientes' },
-        { href: '/plantillas', icon: 'templates', label: 'Plantillas' },
+        { href: AppRoutes.Clientes, icon: 'clients', label: 'Clientes' },
+        { href: AppRoutes.Plantillas, icon: 'templates', label: 'Plantillas' },
       ],
     },
     {
@@ -56,13 +64,13 @@ const NAV_BY_ROLE: Record<UserRole, NavGroup[]> = {
       label: 'PRINCIPAL',
       items: [
         INICIO,
-        { href: '/aprobacion', icon: 'approve', label: 'Aprobación de solicitud', badge: 'appr' },
+        { href: AppRoutes.Aprobaciones, icon: 'approve', label: 'Aprobación de solicitud', badge: NavBadgeType.Aprobaciones },
       ],
     },
   ],
 };
 
-const SHARED_PREFIXES = ['/inicio', '/cotizaciones'];
+const SHARED_PREFIXES = [AppRoutes.Inicio, AppRoutes.Cotizaciones];
 
 export function navForRole(role: UserRole): NavGroup[] {
   return NAV_BY_ROLE[role];
@@ -70,12 +78,12 @@ export function navForRole(role: UserRole): NavGroup[] {
 
 export function homeListPath(role: UserRole): string {
   if (role === UserRole.Ingenieria) {
-    return '/bandeja';
+    return AppRoutes.Bandeja;
   }
   if (role === UserRole.Gerencia) {
-    return '/aprobacion';
+    return AppRoutes.Aprobaciones;
   }
-  return '/solicitudes';
+  return AppRoutes.Solicitudes;
 }
 
 export function canAccessPath(role: UserRole, url: string): boolean {

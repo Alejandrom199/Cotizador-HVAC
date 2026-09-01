@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { isPendingApproval } from '@app/core/role-access';
+import { WorkspaceTab } from '@app/domain/enums';
 import { Quote } from '@app/domain/models/quote.model';
 import { statusClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
@@ -24,7 +25,7 @@ export class ApprovalPage {
   }
 
   open(id: string): void {
-    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: 'informe' } });
+    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Informe } });
   }
 
   approve(id: string): void {

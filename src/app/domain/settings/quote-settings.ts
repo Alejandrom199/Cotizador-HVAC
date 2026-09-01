@@ -1,5 +1,4 @@
-import { ComplexityTier } from '../enums/complexity-tier.enum';
-import { RoomKind } from '../enums/room-kind.enum';
+import { ComplexityTier, RoomKind, SlaStageName } from '../enums';
 
 export interface ComplexityBand {
   maxScore: number;
@@ -10,7 +9,7 @@ export interface ComplexityBand {
 }
 
 export interface StageWeight {
-  k: string;
+  k: SlaStageName | string;
   w: number;
 }
 
@@ -73,9 +72,9 @@ export const DEFAULT_QUOTE_SETTINGS: QuoteSettings = {
   offerValidityDays: 15,
   maxDiscountPct: 40,
   roomTypeMultiplier: {
-    critico: 1.25,
-    comercial: 1,
-    residencial: 0.9,
+    [RoomKind.Critico]: 1.25,
+    [RoomKind.Comercial]: 1,
+    [RoomKind.Residencial]: 0.9,
   },
   defaultTemplateFactorBtu: 650,
   cfmPerTon: 400,
@@ -103,10 +102,10 @@ export const DEFAULT_QUOTE_SETTINGS: QuoteSettings = {
     'EQ-018': 1.5,
   },
   stageWeights: [
-    { k: 'Revisión', w: 0.1 },
-    { k: 'Planos', w: 0.25 },
-    { k: 'Cálculos', w: 0.4 },
-    { k: 'Cotización', w: 0.25 },
+    { k: SlaStageName.Revision, w: 0.1 },
+    { k: SlaStageName.Planos, w: 0.25 },
+    { k: SlaStageName.Calculos, w: 0.4 },
+    { k: SlaStageName.Cotizacion, w: 0.25 },
   ],
   complexity: {
     areaPts: [

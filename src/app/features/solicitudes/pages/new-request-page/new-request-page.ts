@@ -4,8 +4,7 @@ import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { PrintService } from '@app/application/print.service';
 import { ToastService } from '@app/core/toast.service';
-import { QuoteKind, InstallationSubtype } from '@app/domain/enums/quote-kind.enum';
-import { Priority } from '@app/domain/enums/priority.enum';
+import { QuoteKind, InstallationSubtype, MaintenanceSubtype, Priority, ClientType } from '@app/domain/enums';
 import { Client } from '@app/domain/models/client.model';
 import { Icon, IconName } from '@app/shared/ui/icon';
 
@@ -57,9 +56,10 @@ export class NewRequestPage {
     { id: InstallationSubtype.Equipos, label: 'Equipos', icon: 'products' },
     { id: InstallationSubtype.Completa, label: 'Completa (Materiales + Equipos)', icon: 'link' },
   ];
-  readonly maintainOptions: Array<{ id: string; label: string; icon: IconName }> = [
-    { id: 'Preventivo', label: 'Preventivo', icon: 'time' },
-    { id: 'Correctivo', label: 'Correctivo', icon: 'maintain' },
+  readonly maintainOptions: Array<{ id: MaintenanceSubtype; label: string; icon: IconName }> = [
+    { id: MaintenanceSubtype.Preventivo, label: 'Preventivo', icon: 'time' },
+    { id: MaintenanceSubtype.Correctivo, label: 'Correctivo', icon: 'maintain' },
+    { id: MaintenanceSubtype.Integral, label: 'Integral', icon: 'link' },
   ];
   readonly currentOptions = computed(() =>
     this.tipo() === QuoteKind.Instalacion ? this.installOptions : this.maintainOptions,
@@ -172,7 +172,7 @@ export class NewRequestPage {
       direccion: this.ncDir().trim() || this.ncCity().trim() || '—',
       mail: this.ncMail().trim() || '—',
       phone: this.ncPhone().trim() || '—',
-      type: 'Jurídica',
+      type: ClientType.Juridica,
     });
     if (err) {
       return;

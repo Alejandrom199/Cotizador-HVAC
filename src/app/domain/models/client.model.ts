@@ -1,3 +1,5 @@
+import { ClientType } from '../enums/client-type.enum';
+
 export interface Client {
   ruc: string;
   name: string;
@@ -5,5 +7,5 @@ export interface Client {
   direccion: string;
   mail: string;
   phone: string;
-  type: 'Jurídica' | 'Natural';
+  type: ClientType;
 }

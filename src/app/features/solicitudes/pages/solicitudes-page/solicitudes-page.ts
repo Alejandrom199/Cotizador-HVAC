@@ -3,12 +3,20 @@ import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { CreateFlowService } from '@app/application/create-flow.service';
 import { SessionService } from '@app/core/session.service';
-import { UserRole } from '@app/domain/enums/user-role.enum';
+import { UserRole, QuoteStatus } from '@app/domain/enums';
 import { Quote } from '@app/domain/models/quote.model';
 import { kindTag, priorityClass, statusClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
 
-const FILTERS = ['Todas', 'Elaboración', 'Cálculos', 'Enviada', 'Aprobada', 'Reajuste', 'Perdida'];
+const FILTERS = [
+  'Todas',
+  QuoteStatus.Elaboracion,
+  QuoteStatus.Calculos,
+  QuoteStatus.Enviada,
+  QuoteStatus.Aprobada,
+  QuoteStatus.Reajuste,
+  QuoteStatus.Perdida,
+];
 
 @Component({
   selector: 'app-solicitudes-page',

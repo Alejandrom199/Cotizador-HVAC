@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
-import { QuoteStatus } from '@app/domain/enums/quote-status.enum';
-import { ProductCategory } from '@app/domain/enums/product-category.enum';
+import { QuoteStatus, ProductCategory } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
+import { PillBadge, PillBadgeTone } from '@app/shared/ui/pill-badge';
 
 @Component({
   selector: 'app-warehouse-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, PillBadge],
   templateUrl: './warehouse-page.html',
 })
 export class WarehousePage {
@@ -29,8 +29,8 @@ export class WarehousePage {
         const stock = product?.stock ?? null;
         const ok = stock != null && stock >= e.qty;
         const label = stock === 0 ? 'Importar' : ok ? 'En bodega' : 'Compra parcial';
-        const cls = stock === 0 ? 'stock bad' : ok ? 'stock ok' : 'stock warn';
-        return { name: e.name, req: e.qty + ' ' + e.unit, stock: stock != null ? stock + ' u.' : '—', label, cls };
+        const tone: PillBadgeTone = stock === 0 ? 'bad' : ok ? 'ok' : 'warn';
+        return { name: e.name, req: e.qty + ' ' + e.unit, stock: stock != null ? stock + ' u.' : '—', label, tone };
       });
   }
 }

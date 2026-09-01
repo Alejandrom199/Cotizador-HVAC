@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { SessionService } from '@app/core/session.service';
+import { WorkspaceTab } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 import { statusClass } from '@app/shared/ui/presentation';
 
@@ -23,7 +24,7 @@ export class InboxPage {
   );
 
   open(id: string): void {
-    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: 'tiempos' } });
+    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Tiempos } });
   }
 
   take(id: string): void {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
-import { QuoteStatus } from '@app/domain/enums/quote-status.enum';
+import { QuoteStatus } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 
 @Component({
@@ -23,7 +23,11 @@ export class AnalyticsPage {
       : '0';
     const stages = [
       ['Solicitudes', quotes.length, '#2b6cb0'],
-      ['Cotizadas / enviadas', quotes.filter((x) => ['Enviada', 'Aprobada', 'Reajuste'].includes(x.estado)).length, '#b5710f'],
+      [
+        'Cotizadas / enviadas',
+        quotes.filter((x) => x.estado === QuoteStatus.Enviada || x.estado === QuoteStatus.Aprobada || x.estado === QuoteStatus.Reajuste).length,
+        '#b5710f',
+      ],
       ['En negociación', quotes.filter((x) => x.estado === QuoteStatus.Reajuste).length, '#0e6b7b'],
       ['Ganadas', won.length, '#1f9d64'],
     ] as const;

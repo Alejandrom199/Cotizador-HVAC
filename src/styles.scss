@@ -1007,25 +1007,30 @@ h3 {
 .cols-inbox { grid-template-columns: 2fr 1.2fr .9fr .9fr 180px; cursor: default; }
 .cols-tpl { grid-template-columns: .7fr 1.4fr 1.6fr .8fr .6fr .5fr; cursor: default; }
 
-.etapa-dots { display: flex; gap: 4px; margin-top: 6px; }
+.etapa-dots { display: flex; gap: 4px; margin-top: 6px; width: 112px; box-sizing: border-box; }
 .etapa-dots span { height: 4px; flex: 1; background: var(--em-line); border-radius: var(--em-radius-full); }
 .etapa-dots span.on { background: var(--em-accent); }
 .etapa-dots span.lost { background: var(--em-bad); }
 
 /* ==========================================================================
-   Juicy Status Pills & Badges
+   Juicy Status Pills & Badges (Standard 112px x 26px Uniform Size)
    ========================================================================== */
 .status {
+  width: 112px;
+  height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   gap: 6px;
-  padding: 4px 11px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
   border-radius: var(--em-radius-full);
   white-space: nowrap;
+  box-sizing: border-box;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .st-solicitud { color: #475569; background: #f1f5f9; }
@@ -1737,9 +1742,14 @@ h3 {
 .stock {
   font-size: 11.5px;
   font-weight: 700;
-  padding: 3px 9px;
+  padding: 4px 12px;
   border-radius: var(--em-radius-full);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 96px;
 }
 .stock.ok { background: #dcfce7; color: #047857; }
 .stock.warn { background: #fef3c7; color: #b45309; }

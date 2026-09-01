@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { Client } from '@app/domain/models/client.model';
+import { ClientType, AppRoutes } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 
 @Component({
@@ -24,7 +25,7 @@ export class ClientFormPage {
   readonly phone = signal('+593 ');
   readonly city = signal('Quito');
   readonly direccion = signal('');
-  readonly type = signal<Client['type']>('Jurídica');
+  readonly type = signal<ClientType>(ClientType.Juridica);
 
   constructor() {
     const existing = this.ruc() ? this.workspace.findClient(this.ruc()) : undefined;
@@ -39,7 +40,7 @@ export class ClientFormPage {
   }
 
   cancel(): void {
-    void this.router.navigateByUrl('/clientes');
+    void this.router.navigateByUrl(AppRoutes.Clientes);
   }
 
   save(): void {
@@ -54,7 +55,7 @@ export class ClientFormPage {
     };
     const err = this.isNew ? this.workspace.registerClient(client) : this.workspace.updateClient(client);
     if (!err) {
-      void this.router.navigateByUrl('/clientes');
+      void this.router.navigateByUrl(AppRoutes.Clientes);
     }
   }
 }
