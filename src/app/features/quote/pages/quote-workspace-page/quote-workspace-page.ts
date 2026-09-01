@@ -46,6 +46,22 @@ export class QuoteWorkspacePage {
     },
   );
   readonly tab = signal<Tab>('resumen');
+
+  /**
+   * Flag de control para mostrar/ocultar la pestaña de Elementos en cotizaciones.
+   * (Poner en true para volver a activarla).
+   */
+  readonly showElementsTab = signal(false);
+
+  readonly availableTabs = computed(() => [
+    { id: 'resumen' as Tab, l: 'Resumen' },
+    { id: 'calculo' as Tab, l: 'Cálculo HVAC' },
+    ...(this.showElementsTab() ? [{ id: 'elementos' as Tab, l: 'Elementos' }] : []),
+    { id: 'tiempos' as Tab, l: 'Tiempos / SLA' },
+    { id: 'reajuste' as Tab, l: 'Reajuste' },
+    { id: 'informe' as Tab, l: 'Informe final' },
+  ]);
+
   readonly openCats = signal<Record<string, boolean>>({
     Equipos: true,
     Insumos: true,
@@ -177,7 +193,7 @@ export class QuoteWorkspacePage {
 
   applyTpl(): void {
     this.workspace.applyTemplate(this.id());
-    this.tab.set('elementos');
+    this.tab.set(this.showElementsTab() ? 'elementos' : 'resumen');
   }
 
   closeCurrentStage(meta: number): void {

@@ -199,7 +199,7 @@ export class NewRequestPage {
       cliente: this.cliente(),
       ruc: this.ruc(),
       proyecto: this.proyecto(),
-      tipo: this.tipo() + (this.tipo() === QuoteKind.Instalacion ? ' · ' + this.subtipo() : ''),
+      tipo: this.tipo() + (this.tipo() === QuoteKind.Instalacion ? ' - ' + this.subtipo() : ''),
       prio: this.prio(),
       observaciones: this.observaciones(),
       files: this.files(),

@@ -35,7 +35,7 @@
           <div class="trow" style="grid-template-columns:2fr 1.2fr 1fr 1fr" (click)="open(q.id)">
             <div>
               <div class="ellipsis">{{ q.name }}</div>
-              <div class="muted" style="font-size:12px">{{ kindTag(q.tipo) }} · {{ vm().area(q) }}</div>
+              <div class="muted" style="font-size:12px">{{ kindTag(q.tipo) }} - {{ vm().area(q) }}</div>
             </div>
             <div>{{ q.cliente }}</div>
             <div><span [class]="statusClass(q.estado)">{{ q.estado }}</span></div>

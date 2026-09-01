@@ -5,7 +5,7 @@
       <div>
         <h1>{{ q.name }} <span [class]="statusClass(q.estado)" style="margin-left:8px;vertical-align:middle">{{ q.estado }}</span></h1>
         <div class="muted" style="margin-top:6px">
-          {{ q.code }} · {{ q.cliente }} · RUC {{ q.ruc }} · {{ q.tipo }} / {{ q.subtipo }} · Asignado a {{ q.asignado || '—' }}
+          {{ q.code }} - {{ q.cliente }} | RUC {{ q.ruc }} | {{ q.tipo }} / {{ q.subtipo }} | Asignado a {{ q.asignado || '—' }}
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -20,10 +20,7 @@
       </div>
     </div>
     <div class="tabs">
-      @for (t of [
-        {id:'resumen',l:'Resumen'},{id:'calculo',l:'Cálculo HVAC'},{id:'elementos',l:'Elementos'},
-        {id:'tiempos',l:'Tiempos / SLA'},{id:'reajuste',l:'Reajuste'},{id:'informe',l:'Informe final'}
-      ]; track t.id) {
+      @for (t of availableTabs(); track t.id) {
         <button class="tab" [class.on]="tab() === t.id" type="button" (click)="setTab(t.id)">{{ t.l }}</button>
       }
     </div>
@@ -54,7 +51,7 @@
             </div>
             <div>
               <div class="k">Tipo de servicio</div>
-              <div class="v">{{ q.tipo }} · {{ q.subtipo }}</div>
+              <div class="v">{{ q.tipo }} / {{ q.subtipo }}</div>
             </div>
             <div>
               <div class="k">Plantilla base</div>
@@ -140,7 +137,7 @@
       </div>
     }
 
-    @if (tab() === 'elementos' && pricing(); as p) {
+    @if (showElementsTab() && tab() === 'elementos' && pricing(); as p) {
       <div class="calc-layout">
         <div>
           @for (cat of cats; track cat) {
@@ -185,7 +182,7 @@
         @if (slaView(); as sla) {
           <div class="message-strip" [class.ok]="sla.onTime" [class.warn]="!sla.onTime">
             <div class="k"><app-icon name="time" /> {{ sla.onTime ? 'Dentro del plazo estimado' : 'Fuera del plazo estimado' }}</div>
-            <p>Complejidad {{ cx.tier }} → estimado {{ sla.slaLabel }} · {{ sla.daysLabel }}. Acumulado real: {{ sla.cycleLabel }}. Fecha comprometida con el vendedor: {{ sla.promised }}.</p>
+            <p>Complejidad {{ cx.tier }} → estimado {{ sla.slaLabel }} - {{ sla.daysLabel }}. Acumulado real: {{ sla.cycleLabel }}. Fecha comprometida con el vendedor: {{ sla.promised }}.</p>
           </div>
         }
         <div class="calc-layout" style="margin-top:16px">
@@ -262,46 +259,52 @@
     @if (tab() === 'reajuste' && pricing(); as p) {
       <div class="calc-layout">
         <div>
-          <div class="disc-grid">
-            <div class="card card-lg disc-card">
-              <div class="disc-head">
-                <label class="field" style="margin:0">Variación de Precio en insumos</label>
-                <span class="num disc-val" [class.on]="q.descInsumos !== 0">{{ workspace.discLabel(q.descInsumos) }}</span>
+          <div class="card card-lg" style="margin-bottom:16px">
+            <div class="section-title">Ajustes comerciales</div>
+            <p class="muted" style="margin-bottom:16px">
+              Modifica los porcentajes por categoría. El margen se recalcula en tiempo real con límite máximo de {{ maxDisc() }}%.
+            </p>
+            <div class="disc-grid">
+              <div class="card" style="box-shadow:none">
+                <div class="disc-head">
+                  <span class="field" style="margin:0">Insumos</span>
+                  <span class="num disc-val" [class.on]="q.descInsumos !== 0">{{ workspace.discLabel(q.descInsumos) }}</span>
+                </div>
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id, 'descInsumos', $event)" />
+                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
               </div>
-              <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" step="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id,'descInsumos',+$event)" />
-              <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+              <div class="card" style="box-shadow:none">
+                <div class="disc-head">
+                  <span class="field" style="margin:0">Equipos</span>
+                  <span class="num disc-val" [class.on]="q.descEquipos !== 0">{{ workspace.discLabel(q.descEquipos) }}</span>
+                </div>
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id, 'descEquipos', $event)" />
+                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+              </div>
+              <div class="card" style="box-shadow:none">
+                <div class="disc-head">
+                  <span class="field" style="margin:0">Mano de obra</span>
+                  <span class="num disc-val" [class.on]="q.descMO !== 0">{{ workspace.discLabel(q.descMO) }}</span>
+                </div>
+                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id, 'descMO', $event)" />
+                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+              </div>
             </div>
-            <div class="card card-lg disc-card">
-              <div class="disc-head">
-                <label class="field" style="margin:0">Variación de Precio en equipos</label>
-                <span class="num disc-val" [class.on]="q.descEquipos !== 0">{{ workspace.discLabel(q.descEquipos) }}</span>
-              </div>
-              <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" step="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id,'descEquipos',+$event)" />
-              <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+            <div class="message-strip" [class.ok]="!p.bajoPiso" [class.warn]="p.bajoPiso" style="margin-top:16px">
+              <div class="k"><app-icon name="warn" /> {{ p.bajoPiso ? 'Precio por debajo del piso - revisar margen' : 'Precio sobre el piso - margen saludable' }}</div>
+              <p>Costo directo {{ money(p.costo) }}. Piso de venta (margen mín. {{ q.margenMin }}%): {{ money(p.piso) }}. Venta actual: {{ money(p.base) }}.</p>
             </div>
-            <div class="card card-lg disc-card">
-              <div class="disc-head">
-                <label class="field" style="margin:0">Variación de Precio en mano de obra</label>
-                <span class="num disc-val" [class.on]="q.descMO !== 0">{{ workspace.discLabel(q.descMO) }}</span>
-              </div>
-              <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" step="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id,'descMO',+$event)" />
-              <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:16px">
+              <button class="btn btn-primary" type="button" (click)="workspace.logAdjustment(q.id)"><app-icon name="adjust" /> Registrar ajuste en bitácora</button>
             </div>
           </div>
-          <div class="message-strip" [class.ok]="!p.bajoPiso" [class.warn]="p.bajoPiso" style="margin-top:16px">
-            <div class="k"><app-icon name="warn" /> {{ p.bajoPiso ? 'Precio por debajo del piso — revisar margen' : 'Precio sobre el piso — margen saludable' }}</div>
-            <p>Costo directo {{ money(p.costo) }}. Piso de venta (margen mín. {{ q.margenMin }}%): {{ money(p.piso) }}. Venta actual: {{ money(p.base) }}.</p>
-          </div>
-          <div class="actions-row" style="justify-content:flex-start">
-            <button class="btn btn-primary" type="button" (click)="workspace.logAdjustment(q.id)"><app-icon name="adjust" /> Registrar reajuste con trazabilidad</button>
-          </div>
-          <div class="card card-lg" style="margin-top:8px">
+          <div class="card card-lg">
             <div class="section-title">Historial de reajustes</div>
             @if (!q.log.length) {
               <p class="muted">Sin reajustes registrados. Cada cambio quedará aquí con responsable y fecha.</p>
             }
             @for (l of q.log; track l.t + l.m) {
-              <div class="log-row"><strong>{{ l.t }} · {{ l.u }}</strong><div class="muted">{{ l.m }}</div></div>
+              <div class="log-row"><strong>{{ l.t }} - {{ l.u }}</strong><div class="muted">{{ l.m }}</div></div>
             }
           </div>
         </div>
@@ -334,7 +337,7 @@
               </div>
               <div class="span-2">
                 <div class="k">Proyecto</div>
-                <div class="v">{{ q.name }} · {{ q.tipo }} · {{ q.subtipo }}</div>
+                <div class="v">{{ q.name }} - {{ q.tipo }} - {{ q.subtipo }}</div>
               </div>
             </div>
             <div class="table" style="box-shadow:none">

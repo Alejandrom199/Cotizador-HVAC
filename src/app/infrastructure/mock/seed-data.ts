@@ -12,14 +12,14 @@ import { RoomKind } from '../../domain/enums/room-kind.enum';
 import { newUid } from '../../domain/calculators/quote-metrics';
 
 export const SEED_PRODUCTS: Omit<Product, 'activo'>[] = [
-  { code: 'EQ-018', cat: ProductCategory.Equipos, name: 'Split Inverter 18k BTU', unit: 'Unidad', costo: 480, pvp: 690, stock: 15, spec: 'Frío/calor · R-410A · Falcoil' },
-  { code: 'EQ-024', cat: ProductCategory.Equipos, name: 'Split Inverter 24k BTU', unit: 'Unidad', costo: 620, pvp: 890, stock: 8, spec: 'Frío/calor · R-410A' },
-  { code: 'EQ-036', cat: ProductCategory.Equipos, name: 'Cassette 36k BTU', unit: 'Unidad', costo: 980, pvp: 1390, stock: 6, spec: '4 vías · falso techo' },
+  { code: 'EQ-018', cat: ProductCategory.Equipos, name: 'Split Inverter 18k BTU', unit: 'Unidad', costo: 480, pvp: 690, stock: 15, spec: 'Frío/calor - R-410A - Falcoil' },
+  { code: 'EQ-024', cat: ProductCategory.Equipos, name: 'Split Inverter 24k BTU', unit: 'Unidad', costo: 620, pvp: 890, stock: 8, spec: 'Frío/calor - R-410A' },
+  { code: 'EQ-036', cat: ProductCategory.Equipos, name: 'Cassette 36k BTU', unit: 'Unidad', costo: 980, pvp: 1390, stock: 6, spec: '4 vías - falso techo' },
   { code: 'EQ-048', cat: ProductCategory.Equipos, name: 'Unidad de conductos 48k BTU', unit: 'Unidad', costo: 1420, pvp: 1980, stock: 4, spec: 'Alta presión estática' },
-  { code: 'EQ-060', cat: ProductCategory.Equipos, name: 'Condensadora VRF 5TR', unit: 'Unidad', costo: 3200, pvp: 4460, stock: 2, spec: 'Rooftop · modulante' },
+  { code: 'EQ-060', cat: ProductCategory.Equipos, name: 'Condensadora VRF 5TR', unit: 'Unidad', costo: 3200, pvp: 4460, stock: 2, spec: 'Rooftop - modulante' },
   { code: 'EQ-UMA', cat: ProductCategory.Equipos, name: 'UMA central 20TR', unit: 'Unidad', costo: 12800, pvp: 17900, stock: 1, spec: 'Filtra, enfría y distribuye' },
   { code: 'EQ-CHL', cat: ProductCategory.Equipos, name: 'Chiller 40TR agua helada', unit: 'Unidad', costo: 26500, pvp: 35900, stock: 0, spec: 'Importación 6-8 sem' },
-  { code: 'IN-CU14', cat: ProductCategory.Insumos, name: 'Tubería de cobre 1/4" deshidratada', unit: 'm', costo: 3.2, pvp: 5.1, stock: 320, spec: 'Tramo · Tipo L' },
+  { code: 'IN-CU14', cat: ProductCategory.Insumos, name: 'Tubería de cobre 1/4" deshidratada', unit: 'm', costo: 3.2, pvp: 5.1, stock: 320, spec: 'Tramo - Tipo L' },
   { code: 'IN-CU12', cat: ProductCategory.Insumos, name: 'Tubería de cobre 1/2"', unit: 'm', costo: 4.6, pvp: 7.2, stock: 280, spec: 'Tipo L' },
   { code: 'IN-AISL', cat: ProductCategory.Insumos, name: 'Aislamiento elastomérico', unit: 'm', costo: 1.8, pvp: 3.0, stock: 500, spec: 'Espuma negra' },
   { code: 'IN-DUCT', cat: ProductCategory.Insumos, name: 'Plancha fibra de vidrio Climaver', unit: 'm²', costo: 9.5, pvp: 15.0, stock: 210, spec: 'Ducto autoportante' },
@@ -49,7 +49,7 @@ export const SEED_CLIENTS: Client[] = [
 export const SEED_TEMPLATES: SystemTemplate[] = [
   { code: 'PL-01', name: 'Climatización Directa', sub: 'Split / Cassette (Falcoil)', driver: 'Expansión directa, sin red de ductos', factorBtu: 600, ducto: false, items: ['EQ-auto', 'IN-CU14', 'IN-CU12', 'IN-AISL', 'IN-DREN', 'IN-SOP', 'IN-SOLD', 'IN-GAS', 'MO-INST', 'MO-PRUEB', 'LG-TRANS'] },
   { code: 'PL-02', name: 'Climatización por Ductos', sub: 'Fibra Climaver + rejillas', driver: 'Unidad de conductos con red de distribución', factorBtu: 650, ducto: true, items: ['EQ-auto', 'IN-DUCT', 'IN-REJI', 'IN-REJR', 'IN-CU12', 'IN-AISL', 'IN-DREN', 'IN-CINTA', 'IN-SOP', 'IN-GAS', 'MO-INST', 'MO-DUCT', 'MO-PRUEB', 'LG-TRANS', 'LG-GRUA'] },
-  { code: 'PL-03', name: 'UMAS / Sistema Central', sub: 'UMA + Chiller · edificio', driver: 'Manejadora central y red metálica', factorBtu: 700, ducto: true, items: ['EQ-UMA', 'IN-DUCT', 'IN-REJI', 'IN-REJR', 'IN-CU12', 'IN-AISL', 'IN-CINTA', 'IN-SOP', 'IN-GAS', 'MO-INST', 'MO-DUCT', 'MO-DESM', 'MO-PRUEB', 'LG-TRANS', 'LG-GRUA'] },
+  { code: 'PL-03', name: 'UMAS / Sistema Central', sub: 'UMA + Chiller - edificio', driver: 'Manejadora central y red metálica', factorBtu: 700, ducto: true, items: ['EQ-UMA', 'IN-DUCT', 'IN-REJI', 'IN-REJR', 'IN-CU12', 'IN-AISL', 'IN-CINTA', 'IN-SOP', 'IN-GAS', 'MO-INST', 'MO-DUCT', 'MO-DESM', 'MO-PRUEB', 'LG-TRANS', 'LG-GRUA'] },
   { code: 'PL-04', name: 'Mantenimiento', sub: 'Preventivo / Correctivo', driver: 'Mano de obra y repuestos, sin obra nueva', factorBtu: 0, ducto: false, items: ['MO-INST', 'MO-PRUEB', 'IN-GAS', 'IN-SOLD'] },
 ];
 

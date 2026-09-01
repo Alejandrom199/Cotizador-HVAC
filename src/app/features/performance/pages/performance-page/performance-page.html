@@ -23,7 +23,7 @@
       <div class="card" style="border:none;box-shadow:none;border-radius:0">
         @for (s of vm().sellers; track s.id) {
           <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--em-line)">
-            <span>{{ s.name }}</span><span class="num">{{ s.won }}/{{ s.n }} · {{ s.val }}</span>
+            <span>{{ s.name }}</span><span class="num">{{ s.won }}/{{ s.n }} - {{ s.val }}</span>
           </div>
         }
       </div>
@@ -33,7 +33,7 @@
       <div class="card" style="border:none;box-shadow:none;border-radius:0">
         @for (e of vm().engineers; track e.id) {
           <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--em-line)">
-            <span>{{ e.name }}</span><span class="num">{{ e.n }} · SLA {{ e.sla }}</span>
+            <span>{{ e.name }}</span><span class="num">{{ e.n }} - SLA {{ e.sla }}</span>
           </div>
         }
         <h3 style="margin:16px 0 10px">Tiempo por etapa</h3>

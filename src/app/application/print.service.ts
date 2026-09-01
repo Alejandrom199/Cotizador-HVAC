@@ -43,7 +43,7 @@ export class PrintService {
         </div>
       </div>
       <p><b>Cliente:</b> ${quote.cliente} &nbsp; <b>RUC:</b> ${quote.ruc || '—'}<br>
-      <b>Proyecto:</b> ${quote.name} &nbsp; <b>Tipo:</b> ${quote.tipo} · ${quote.subtipo}</p>
+      <b>Proyecto:</b> ${quote.name} &nbsp; <b>Tipo:</b> ${quote.tipo} - ${quote.subtipo}</p>
       <div class="box">
         <div class="k">Inversión total estimada</div>
         <div class="big n">${formatMoney(pricing.total)}</div>
@@ -81,7 +81,7 @@ export class PrintService {
         </div>
       </div>
       <p><b>Cliente:</b> ${quote.cliente}<br><b>RUC:</b> ${quote.ruc || '—'}<br>
-      <b>Proyecto:</b> ${quote.name}<br><b>Tipo:</b> ${quote.tipo} · ${quote.subtipo}</p>
+      <b>Proyecto:</b> ${quote.name}<br><b>Tipo:</b> ${quote.tipo} - ${quote.subtipo}</p>
       <table>
         <thead><tr><th>Descripción</th><th>Categoría</th><th>Cant.</th><th>Unitario</th><th>Total</th></tr></thead>
         <tbody>${rows}</tbody>

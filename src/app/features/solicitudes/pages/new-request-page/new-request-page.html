@@ -31,7 +31,7 @@
             <div class="card" style="position:absolute;left:0;right:0;z-index:8;padding:0">
               @for (h of hits(); track h.ruc) {
                 <button type="button" class="btn btn-ghost" style="display:block;width:100%;padding:10px 12px;text-align:left" (click)="pick(h)">
-                  {{ h.name }}<br /><span class="num muted">RUC {{ h.ruc }} · {{ h.city }}</span>
+                  {{ h.name }}<br /><span class="num muted">RUC {{ h.ruc }} - {{ h.city }}</span>
                 </button>
               }
             </div>

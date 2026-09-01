@@ -1,7 +1,7 @@
 <div class="totals-box">
   <div class="section-title">Resumen de inversión</div>
   <div class="total num">{{ money(pricing().total) }}</div>
-  <div class="iva-note">IVA {{ iva() }}% incluido · USD</div>
+  <div class="iva-note">IVA {{ iva() }}% incluido (USD)</div>
   <div class="inv-row"><span>Subtotal</span><span class="num">{{ money(pricing().base) }}</span></div>
   <div class="inv-row"><span>IVA {{ iva() }}%</span><span class="num">{{ money(pricing().iva) }}</span></div>
   <div class="inv-row"><span>Costo directo</span><span class="num">{{ money(pricing().costo) }}</span></div>
@@ -11,6 +11,6 @@
       <span>Margen</span><span class="num">{{ pricing().margen.toFixed(1) }}%</span>
     </div>
     <div class="bar"><span [style.width.%]="marginBar(pricing().margen)"></span></div>
-    <div class="floor-pill">Piso de venta {{ money(pricing().piso) }} · {{ pricing().bajoPiso ? 'bajo rango' : 'dentro de rango' }}</div>
+    <div class="floor-pill">Piso de venta {{ money(pricing().piso) }} - {{ pricing().bajoPiso ? 'bajo rango' : 'dentro de rango' }}</div>
   </div>
 </div>

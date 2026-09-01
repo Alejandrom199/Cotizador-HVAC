@@ -272,7 +272,7 @@ export class QuoteWorkspaceService {
       etapa: Math.min(4, index + 2),
       estado: index >= 3 ? QuoteStatus.Validacion : names[index] ?? quote.estado,
     });
-    this.toast.show('Etapa cerrada · ' + hours + ' h registradas');
+    this.toast.show('Etapa cerrada - ' + hours + ' h registradas');
   }
 
   applyTemplate(id: string): void {
@@ -296,7 +296,7 @@ export class QuoteWorkspaceService {
       estado: nextStatus,
       etapa: Math.max(quote.etapa, 3),
     });
-    this.toast.show('Plantilla aplicada · ' + elements.length + ' líneas generadas desde el cálculo');
+    this.toast.show('Plantilla aplicada - ' + elements.length + ' líneas generadas desde el cálculo');
   }
 
   sendQuote(id: string): void {

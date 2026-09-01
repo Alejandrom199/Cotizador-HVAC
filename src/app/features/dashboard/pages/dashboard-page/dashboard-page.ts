@@ -70,7 +70,7 @@ export class DashboardPage {
         { label: 'Por aprobar', value: quotes.filter((x) => isPendingApproval(x.estado)).length, sub: 'finalizadas por ingeniería', icon: 'approve' },
         { label: 'Tasa de conversión', value: conv + '%', sub: won.length + ' ganadas / ' + lost.length + ' perdidas', chip: 'línea base', icon: 'percent' },
         { label: 'Ticket promedio', value: money(totalVal / Math.max(1, quotes.length)), sub: 'por cotización', icon: 'money' },
-        { label: 'Margen promedio', value: avgMargin + '%', sub: 'sobre venta · meta 25%', icon: 'percent' },
+        { label: 'Margen promedio', value: avgMargin + '%', sub: 'sobre venta - meta 25%', icon: 'percent' },
       ];
       dashListTitle = 'Pendientes de aprobación';
       sidePanelTitle = 'Motivo de pérdida';

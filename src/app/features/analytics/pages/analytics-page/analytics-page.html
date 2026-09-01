@@ -37,7 +37,7 @@
         } @empty { <p class="muted">Sin pérdidas registradas</p> }
         <h3 style="margin:16px 0 10px">Margen por tipo</h3>
         @for (t of vm().tipos; track t.label) {
-          <div style="margin-bottom:8px"><div>{{ t.label }} · {{ t.margen }}</div><div class="bar"><span [style.width]="t.pct"></span></div></div>
+          <div style="margin-bottom:8px"><div>{{ t.label }} - {{ t.margen }}</div><div class="bar"><span [style.width]="t.pct"></span></div></div>
         }
       </div>
     </div>
