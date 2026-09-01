@@ -50,6 +50,7 @@ export const SEED_CLIENTS: Client[] = [
   { ruc: '0190987654001', name: 'Clínica Santa Inés', city: 'Cuenca', direccion: 'Av. Solano 12-80, Cuenca', mail: 'mantenimiento@santaines.ec', phone: '+593 7 405 1122', type: ClientType.Juridica },
   { ruc: '0993456789001', name: 'Hotel Oro Verde', city: 'Machala', direccion: 'Av. 25 de Junio, Machala', mail: 'ing@oroverde.ec', phone: '+593 7 293 0555', type: ClientType.Juridica },
   { ruc: '1712345678001', name: 'Corp. Vinueza', city: 'Quito', direccion: 'Cumbayá, Quito', mail: 'jvinueza@correo.ec', phone: '+593 99 812 3344', type: ClientType.Natural },
+  { ruc: '0010930674288', name: 'Saul Maldonado', city: 'Guayaquil', direccion: 'Av. Francisco de Orellana, Guayaquil', mail: 'smaldonado@emasesor.ec', phone: '+593 99 123 4567', type: ClientType.Juridica },
 ];
 
 export const SEED_TEMPLATES: SystemTemplate[] = [

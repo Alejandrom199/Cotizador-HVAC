@@ -97,7 +97,7 @@ export function canAccessPath(role: UserRole, url: string): boolean {
 }
 
 export function isPendingApproval(status: QuoteStatus | string): boolean {
-  return status === QuoteStatus.Validacion;
+  return status === QuoteStatus.Validacion || status === QuoteStatus.Reajuste;
 }
 
 export function isPendingSend(status: QuoteStatus | string): boolean {

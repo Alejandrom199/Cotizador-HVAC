@@ -13,7 +13,9 @@ import { PillBadge, PillBadgeTone } from '@app/shared/ui/pill-badge';
 export class WarehousePage {
   readonly workspace = inject(QuoteWorkspaceService);
   readonly rows = computed(() =>
-    this.workspace.quotes().filter((q) => q.estado === QuoteStatus.Aprobada),
+    this.workspace
+      .quotes()
+      .filter((q) => q.estado === QuoteStatus.Aprobada || q.estado === QuoteStatus.Enviada),
   );
 
   itemsOf(quoteId: string) {
