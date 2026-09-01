@@ -9,57 +9,96 @@
         <div class="brand-sub">EMASESOR - ECUADOR</div>
       </div>
     </div>
+    
     <div style="flex:1"></div>
-    <div class="role-switch">
-      <span>ROL</span>
-      @for (r of roles; track r.id) {
-        <button
-          class="role-btn"
-          [class.on]="session.role() === r.id"
-          type="button"
-          [title]="r.label"
-          [attr.aria-label]="r.label"
-          (click)="setRole(r.id)"
-        >
-          <app-icon [name]="r.icon" />
-        </button>
-      }
-    </div>
-    <div style="display:flex;align-items:center;gap:16px;padding-left:6px">
+
+    <div style="display:flex;align-items:center;gap:14px">
       <div class="iva-chip"><app-icon name="percent" size="sm" /><span>IVA</span><span class="num">{{ iva() }}%</span></div>
-      <div class="who">
-        <div class="avatar">{{ initials() }}</div>
-        <div class="who-info">
-          <div class="name">{{ profile().name }}</div>
-          <div class="muted-name">{{ profile().label }}</div>
-        </div>
+      
+      <div class="profile-dropdown-container">
+        <button
+          class="profile-trigger-btn"
+          type="button"
+          (click)="toggleRoleMenu()"
+          [attr.aria-expanded]="showRoleMenu()"
+          title="Cambiar perfil de usuario"
+        >
+          <div class="avatar">{{ initials() }}</div>
+          <div class="who-info">
+            <div class="name">{{ profile().name }}</div>
+            <div class="muted-name">{{ profile().label }}</div>
+          </div>
+          <svg class="chevron-arrow" [class.rotated]="showRoleMenu()" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        @if (showRoleMenu()) {
+          <div class="profile-dropdown-backdrop" (click)="showRoleMenu.set(false)"></div>
+          <div class="profile-dropdown-menu">
+            <div class="profile-dropdown-header">Cambiar perfil de usuario</div>
+            @for (p of profilesList; track p.id) {
+              <button
+                class="profile-dropdown-item"
+                [class.active]="session.role() === p.id"
+                type="button"
+                (click)="selectRole(p.id)"
+              >
+                <div class="avatar-sm">{{ p.initials }}</div>
+                <div class="profile-item-info">
+                  <div class="profile-item-name">{{ p.name }}</div>
+                  <div class="profile-item-role">{{ p.label }} - {{ p.desc }}</div>
+                </div>
+                @if (session.role() === p.id) {
+                  <svg class="active-check" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                }
+              </button>
+            }
+          </div>
+        }
       </div>
     </div>
   </header>
 
   <div class="app-body">
-    <nav class="side">
-      @for (g of nav(); track g.label) {
-        <div class="nav-label">{{ g.label }}</div>
-        @for (item of g.items; track item.href) {
-          <a class="nav-btn" [href]="item.href" [class.on]="isOn(item.href)" (click)="go($event, item.href)">
-            <app-icon [name]="item.icon" />
-            <span>{{ item.label }}</span>
-            @if (item.badge === 'sol') {
-              <span class="badge">{{ solCount() }}</span>
-            }
-            @if (item.badge === 'pool') {
-              <span class="badge pool">{{ poolCount() }}</span>
-            }
-            @if (item.badge === 'appr') {
-              <span class="badge pool">{{ approvalCount() }}</span>
-            }
-            @if (item.badge === 'send') {
-              <span class="badge">{{ sendCount() }}</span>
-            }
-          </a>
+    <nav class="side" [class.collapsed]="collapsed()">
+      <button
+        class="rail-toggle-btn"
+        type="button"
+        (click)="toggleSidebar()"
+        [title]="collapsed() ? 'Expandir menú' : 'Contraer menú'"
+        [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'"
+      >
+        <svg class="rail-toggle-arrow" [class.rotated]="collapsed()" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="side-nav-content">
+        @for (g of nav(); track g.label) {
+          <div class="nav-label">{{ g.label }}</div>
+          @for (item of g.items; track item.href) {
+            <a class="nav-btn" [href]="item.href" [class.on]="isOn(item.href)" [title]="item.label" (click)="go($event, item.href)">
+              <app-icon [name]="item.icon" />
+              <span class="nav-btn-text">{{ item.label }}</span>
+              @if (item.badge === 'sol') {
+                <span class="badge">{{ solCount() }}</span>
+              }
+              @if (item.badge === 'pool') {
+                <span class="badge pool">{{ poolCount() }}</span>
+              }
+              @if (item.badge === 'appr') {
+                <span class="badge pool">{{ approvalCount() }}</span>
+              }
+              @if (item.badge === 'send') {
+                <span class="badge">{{ sendCount() }}</span>
+              }
+            </a>
+          }
         }
-      }
+      </div>
     </nav>
     <main class="content">
       <router-outlet />

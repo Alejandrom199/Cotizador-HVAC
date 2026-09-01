@@ -40,8 +40,8 @@ export class NewRequestPage {
     'Oficinas administrativas planta Quito. Se requieren 4 cassettes 36k BTU en open space y 2 splits 24k en salas de reunión.',
   );
   readonly files = signal<DraftFile[]>([
-    { id: 'mf1', name: 'Plano_arquitectonico_Afecor.pdf', size: 2457600, sizeStr: '2400 KB', ext: 'PDF' },
-    { id: 'mf2', name: 'Layout_oficinas_planta1.dwg', size: 1843200, sizeStr: '1800 KB', ext: 'DWG' },
+    { id: 'mf1', name: 'Plano_arquitectonico_Afecor.pdf', size: 2457600, sizeStr: '2.4 MB', ext: 'PDF' },
+    { id: 'mf2', name: 'Layout_oficinas_planta1.dwg', size: 1843200, sizeStr: '1.8 MB', ext: 'DWG' },
   ]);
   readonly showNewCli = signal(false);
   readonly ncRuc = signal('');
@@ -141,7 +141,7 @@ export class NewRequestPage {
         id: Math.random().toString(36).slice(2, 8),
         name: file.name,
         size: file.size,
-        sizeStr: (file.size / 1024).toFixed(0) + ' KB',
+        sizeStr: this.formatFileSize(file.size),
         ext: ext.toUpperCase(),
       });
     });
@@ -149,6 +149,18 @@ export class NewRequestPage {
       this.files.update((list) => [...list, ...add]);
     }
     input.value = '';
+  }
+
+  formatFileSize(bytes: number): string {
+    if (!bytes) {
+      return '0 KB';
+    }
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1) {
+      return (Math.round(mb * 10) / 10).toFixed(1).replace(/\.0$/, '') + ' MB';
+    }
+    const kb = bytes / 1024;
+    return kb.toFixed(0) + ' KB';
   }
 
   saveClient(): void {

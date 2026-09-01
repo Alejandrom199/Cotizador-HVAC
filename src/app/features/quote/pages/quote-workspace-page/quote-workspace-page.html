@@ -67,15 +67,17 @@
             </div>
           </div>
         </div>
-        <div class="totals-box reports-box">
-          <div class="section-title" style="color:#d7e3ee;border-bottom-color:rgba(255,255,255,.12)">Descargar reportes</div>
-          <p style="margin:0 0 16px;font-size:13px;color:#8aa0b5;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico completo de ingeniería.</p>
-          <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;justify-content:center">
-            <app-icon name="report-final" /> Informe final (PDF)
-          </button>
-          <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;justify-content:center;margin-top:8px;background:transparent;color:#d7e3ee;border-color:rgba(255,255,255,.22)">
-            <app-icon name="report-detail" /> Informe detallado
-          </button>
+        <div class="card card-lg">
+          <div class="section-title">Descargar reportes</div>
+          <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico completo de ingeniería.</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;justify-content:center">
+              <app-icon name="report-final" /> Informe final (PDF)
+            </button>
+            <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;justify-content:center">
+              <app-icon name="report-detail" /> Informe detallado
+            </button>
+          </div>
         </div>
         <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
       </div>
@@ -180,78 +182,82 @@
     @if (tab() === 'tiempos' && complexity(); as cx) {
       @if (pricing(); as p) {
         @if (slaView(); as sla) {
-          <div class="message-strip" [class.ok]="sla.onTime" [class.warn]="!sla.onTime">
+          <div class="message-strip" [class.ok]="sla.onTime" [class.warn]="!sla.onTime" style="margin-bottom:20px">
             <div class="k"><app-icon name="time" /> {{ sla.onTime ? 'Dentro del plazo estimado' : 'Fuera del plazo estimado' }}</div>
-            <p>Complejidad {{ cx.tier }} → estimado {{ sla.slaLabel }} - {{ sla.daysLabel }}. Acumulado real: {{ sla.cycleLabel }}. Fecha comprometida con el vendedor: {{ sla.promised }}.</p>
+            <p>Complejidad {{ cx.tier }} → estimado {{ sla.slaLabel }} — {{ sla.daysLabel }}. Acumulado real: {{ sla.cycleLabel }}. Fecha comprometida con el vendedor: {{ sla.promised }}.</p>
           </div>
         }
-        <div class="calc-layout" style="margin-top:16px">
-          <div>
-            <div class="sla-split">
-              <div class="card card-lg">
-                <div class="section-title">Complejidad calculada</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-                  <span class="status" [style.background]="cx.bg" [style.color]="cx.color">{{ cx.tier }}</span>
-                  <span class="muted">score {{ cx.score }}</span>
-                </div>
-                @for (d of cx.drivers; track d.label) {
-                  <div class="driver-row">
-                    <div class="driver-meta">
-                      <span>{{ d.label }}</span>
-                      <span class="num" [class.ok-pts]="d.pts === 0">{{ d.pts >= 0 ? '+' + d.pts : d.pts }}</span>
-                    </div>
-                    <div class="bar"><span [style.width.%]="driverBar(d.pts)"></span></div>
-                  </div>
-                }
-              </div>
-              <div class="totals-box">
-                <div class="section-title">Compromiso al vendedor</div>
-                <div class="total">{{ slaView()?.promised }}</div>
-                <div class="iva-note">fecha de entrega estimada</div>
-                <div class="inv-row"><span>Plazo estimado</span><span class="num">{{ slaView()?.slaLabel }}</span></div>
-                <div class="inv-row"><span>Equivale a</span><span>{{ slaView()?.daysLabel }}</span></div>
-                <div class="inv-row"><span>Real acumulado</span><span>{{ slaView()?.cycleLabel }}</span></div>
-                <div class="inv-row"><span>Vendedor</span><span>{{ q.vendedor || '—' }}</span></div>
-                <div class="inv-row"><span>Ingeniero</span><span>{{ q.ingeniero || '—' }}</span></div>
-                @if (!q.ingeniero) {
-                  <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px" type="button" (click)="workspace.takeRequest(q.id)">
-                    <app-icon name="take" /> Tomar solicitud
-                  </button>
-                }
-              </div>
+
+        <div class="sla-top-grid" style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;margin-bottom:20px">
+          <div class="card card-lg">
+            <div class="section-title">Complejidad calculada</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+              <span class="status" [style.background]="cx.bg" [style.color]="cx.color">{{ cx.tier }}</span>
+              <span class="muted">score {{ cx.score }}</span>
             </div>
-            <div class="table" style="margin-top:16px">
-              <div class="thead cols-sla">
-                <span>Etapa</span><span>Duración real</span><span>Meta</span><span>Desvío</span><span>Estado</span><span></span>
-              </div>
-              @for (s of stages(); track s.name) {
-                <div class="trow static cols-sla">
-                  <strong>{{ s.name }}</strong>
-                  <div>
-                    <div>{{ s.done ? hours(s.real) : s.activa ? 'en curso' : '—' }}</div>
-                    <div class="bar" style="margin-top:6px"><span [style.width.%]="s.pct"></span></div>
-                  </div>
-                  <span class="num">{{ hours(s.meta) }}</span>
-                  <span class="num">{{ desvioLabel(s.desvio) }}</span>
-                  <span class="status" [class.st-cálculos]="s.activa" [class.st-enviada]="s.done">{{ stageStatus(s) }}</span>
-                  <span>
-                    @if (s.activa) {
-                      <button class="btn btn-sm btn-primary" type="button" (click)="closeCurrentStage(s.meta)"><app-icon name="check" /> Cerrar</button>
-                    }
-                  </span>
+            @for (d of cx.drivers; track d.label) {
+              <div class="driver-row">
+                <div class="driver-meta">
+                  <span>{{ d.label }}</span>
+                  <span class="num" [class.ok-pts]="d.pts === 0">{{ d.pts >= 0 ? '+' + d.pts : d.pts }}</span>
                 </div>
-              }
-              <div class="trow static cols-sla calc-total">
-                <strong>Ciclo total</strong>
-                <span>{{ slaView()?.cycleLabel }}</span>
-                <span class="num">{{ slaView()?.slaLabel }}</span>
-                <span></span>
-                <span></span>
-                <span></span>
+                <div class="bar"><span [style.width.%]="driverBar(d.pts)"></span></div>
               </div>
+            }
+          </div>
+
+          <div class="totals-box">
+            <div class="section-title">Compromiso al vendedor</div>
+            <div class="total">{{ slaView()?.promised }}</div>
+            <div class="iva-note">fecha de entrega estimada</div>
+            <div class="inv-row"><span>Plazo estimado</span><span class="num">{{ slaView()?.slaLabel }}</span></div>
+            <div class="inv-row"><span>Equivale a</span><span>{{ slaView()?.daysLabel }}</span></div>
+            <div class="inv-row"><span>Real acumulado</span><span>{{ slaView()?.cycleLabel }}</span></div>
+            <div class="inv-row"><span>Vendedor</span><span>{{ q.vendedor || '—' }}</span></div>
+            <div class="inv-row"><span>Ingeniero</span><span>{{ q.ingeniero || '—' }}</span></div>
+            @if (!q.ingeniero) {
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px" type="button" (click)="workspace.takeRequest(q.id)">
+                <app-icon name="take" /> Tomar solicitud
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:20px">
+          <div class="panel-head">
+            <h3>Control de etapas y tiempos de ingeniería (SLA)</h3>
+            <span class="chip">Ciclo: {{ slaView()?.cycleLabel }} / Meta: {{ slaView()?.slaLabel }}</span>
+          </div>
+          <div class="table">
+            <div class="thead cols-sla-full">
+              <span>Etapa</span><span>Duración real</span><span>Meta</span><span>Desvío</span><span>Estado</span><span>Acción</span>
+            </div>
+            @for (s of stages(); track s.name) {
+              <div class="trow static cols-sla-full">
+                <strong>{{ s.name }}</strong>
+                <div>
+                  <div style="font-weight:600">{{ s.done ? hours(s.real) : s.activa ? 'en curso' : '—' }}</div>
+                  <div class="bar" style="margin-top:6px"><span [style.width.%]="s.pct"></span></div>
+                </div>
+                <span class="num">{{ hours(s.meta) }}</span>
+                <span class="num" [style.color]="(s.desvio ?? 0) > 0 ? '#e11d48' : 'inherit'">{{ desvioLabel(s.desvio) }}</span>
+                <div><span class="status" [class.st-cálculos]="s.activa" [class.st-enviada]="s.done">{{ stageStatus(s) }}</span></div>
+                <div>
+                  @if (s.activa) {
+                    <button class="btn btn-sm btn-primary" type="button" (click)="closeCurrentStage(s.meta)"><app-icon name="check" size="sm" /> Cerrar</button>
+                  }
+                </div>
+              </div>
+            }
+            <div class="trow static cols-sla-full calc-total">
+              <strong>Ciclo total acumulado</strong>
+              <strong class="num">{{ slaView()?.cycleLabel }}</strong>
+              <span class="num">{{ slaView()?.slaLabel }}</span>
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </div>
-          <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
         </div>
       }
     }

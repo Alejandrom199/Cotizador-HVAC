@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
@@ -23,6 +23,16 @@ export class ShellLayout {
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly createFlow = inject(CreateFlowService);
   private readonly router = inject(Router);
+
+  readonly collapsed = signal(false);
+  readonly showRoleMenu = signal(false);
+
+  readonly profilesList = [
+    { id: UserRole.Ingenieria, name: 'Ing. Paredes', label: 'Ingeniería', initials: 'IP', desc: 'Cálculos y diseño HVAC' },
+    { id: UserRole.Ventas, name: 'M. Coello', label: 'Ventas', initials: 'MC', desc: 'Solicitudes y clientes' },
+    { id: UserRole.Gerencia, name: 'D. Andrade', label: 'Gerencia', initials: 'DA', desc: 'Aprobación y analítica' },
+  ];
+
   private readonly url = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -31,11 +41,18 @@ export class ShellLayout {
     { initialValue: this.router.url },
   );
 
-  readonly roles: Array<{ id: UserRole; label: string; icon: IconName }> = [
-    { id: UserRole.Ingenieria, label: 'Ingeniería', icon: 'engineering' },
-    { id: UserRole.Ventas, label: 'Ventas', icon: 'sales' },
-    { id: UserRole.Gerencia, label: 'Gerencia', icon: 'management' },
-  ];
+  toggleSidebar(): void {
+    this.collapsed.update((v) => !v);
+  }
+
+  toggleRoleMenu(): void {
+    this.showRoleMenu.update((v) => !v);
+  }
+
+  selectRole(role: UserRole): void {
+    this.setRole(role);
+    this.showRoleMenu.set(false);
+  }
 
   readonly nav = computed(() => navForRole(this.session.role()));
 
