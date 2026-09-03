@@ -24,11 +24,16 @@ export class InboxPage {
   );
 
   open(id: string): void {
-    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Tiempos } });
+    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Resumen } });
   }
 
   take(id: string): void {
     this.workspace.takeRequest(id);
+    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Calculo } });
+  }
+
+  openMine(id: string): void {
+    void this.router.navigate(['/cotizaciones', id], { queryParams: { tab: WorkspaceTab.Calculo } });
   }
 
   sla(id: string): string {

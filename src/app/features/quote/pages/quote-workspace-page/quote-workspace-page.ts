@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { SessionService } from '@app/core/session.service';
 import { homeListPath, isPendingApproval, isPendingSend } from '@app/core/role-access';
-import { WorkspaceTab, ProductCategory, RoomKind, UserRole, DiscountCategory } from '@app/domain/enums';
+import { WorkspaceTab, ProductCategory, RoomKind, UserRole, DiscountCategory, QuoteStatus } from '@app/domain/enums';
 import { statusClass, stockClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
 import { InvestmentSummary } from '@app/shared/ui/investment-summary/investment-summary';
@@ -134,7 +134,34 @@ export class QuoteWorkspacePage {
   });
   readonly iva = computed(() => this.workspace.settings.ivaRate);
   readonly maxDisc = computed(() => this.workspace.settings.maxDiscountPct);
+  readonly discountParams = this.workspace.discountParams;
   readonly validityDays = computed(() => this.workspace.settings.offerValidityDays);
+
+  maxDiscountFor(category: DiscountCategory): number {
+    return this.workspace.maxDiscountFor(category);
+  }
+
+  maxSurchargeFor(category: DiscountCategory): number {
+    return this.workspace.maxSurchargeFor(category);
+  }
+  readonly isEngineering = computed(
+    () => this.session.isEngineering() || this.session.role() === UserRole.Ingenieria,
+  );
+  readonly isUnassigned = computed(() => {
+    const q = this.quote();
+    return !q?.ingeniero || q?.estado === QuoteStatus.Solicitud;
+  });
+  readonly isEngineeringUnassigned = computed(() => this.isEngineering() && this.isUnassigned());
+
+  readonly clientInfo = computed(() => {
+    const q = this.quote();
+    if (!q?.ruc) {
+      return null;
+    }
+    return this.workspace.findClient(q.ruc) ?? null;
+  });
+  readonly clientCity = computed(() => this.clientInfo()?.city || '—');
+
   readonly canApprove = computed(() => {
     const q = this.quote();
     return this.session.role() === UserRole.Gerencia && !!q && isPendingApproval(q.estado);
@@ -154,6 +181,27 @@ export class QuoteWorkspacePage {
     }
     return 'Solicitudes';
   });
+
+  take(): void {
+    const q = this.quote();
+    if (!q) {
+      return;
+    }
+    this.workspace.takeRequest(q.id);
+    this.tab.set(WorkspaceTab.Calculo);
+  }
+
+  formatFileSize(bytes?: number): string {
+    if (!bytes) {
+      return '0 KB';
+    }
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1) {
+      return (Math.round(mb * 10) / 10).toFixed(1).replace(/\.0$/, '') + ' MB';
+    }
+    const kb = bytes / 1024;
+    return kb.toFixed(0) + ' KB';
+  }
 
   money(n: number): string {
     return this.workspace.money(n);

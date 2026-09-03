@@ -154,6 +154,14 @@ describe('PrintService', () => {
       expect(writtenHtml).toContain('Términos y Condiciones Comerciales:');
       expect(writtenHtml).toContain('Elaborado y Presentado por:');
       expect(writtenHtml).toContain('Aceptación y Aprobación del Cliente:');
+
+      // Verificación de Estructura de Impresión Multi-Página
+      expect(writtenHtml).toContain('report-layout-table');
+      expect(writtenHtml).toContain('doc-header');
+      expect(writtenHtml).toContain('doc-footer');
+      expect(writtenHtml).toContain('display: table-header-group');
+      expect(writtenHtml).toContain('display: table-footer-group');
+      expect(writtenHtml).toContain('page-break-inside: avoid !important');
     });
 
     it('debe retornar false si el navegador bloquea las ventanas emergentes (popup null)', () => {
@@ -166,7 +174,7 @@ describe('PrintService', () => {
   });
 
   describe('printDetailed (Informe Detallado)', () => {
-    it('debe generar HTML de informe técnico con KPIs de ingeniería y partidas agrupadas', () => {
+    it('debe generar HTML de informe técnico con KPIs de ingeniería, partidas agrupadas y estructura multi-página', () => {
       vi.spyOn(window, 'open').mockReturnValue(mockWindow as unknown as Window);
 
       const result = service.printDetailed(sampleQuote, DEFAULT_QUOTE_SETTINGS);
@@ -185,11 +193,16 @@ describe('PrintService', () => {
       expect(writtenHtml).toContain('kpi-card');
       expect(writtenHtml).toContain('Subtotal Equipos &amp; Insumos:');
       expect(writtenHtml).toContain('Subtotal Mano de Obra &amp; Logística:');
+
+      // Verificación de Estructura Multi-Página
+      expect(writtenHtml).toContain('report-layout-table');
+      expect(writtenHtml).toContain('doc-header');
+      expect(writtenHtml).toContain('doc-footer');
     });
   });
 
   describe('printRequest (Solicitud de Cotización)', () => {
-    it('debe generar HTML con los datos de solicitud, prioridad y lista de archivos adjuntos', () => {
+    it('debe generar HTML con los datos de solicitud, prioridad, lista de archivos adjuntos y pie corporativo', () => {
       vi.spyOn(window, 'open').mockReturnValue(mockWindow as unknown as Window);
 
       const payload = {
@@ -222,6 +235,11 @@ describe('PrintService', () => {
       expect(writtenHtml).toContain('Requiere visita técnica urgente y toma de muestras térmicas.');
       expect(writtenHtml).toContain('Solicitado por:');
       expect(writtenHtml).toContain('Recibido en EMASESOR:');
+
+      // Verificación de Estructura Multi-Página
+      expect(writtenHtml).toContain('report-layout-table');
+      expect(writtenHtml).toContain('doc-header');
+      expect(writtenHtml).toContain('doc-footer');
     });
 
     it('debe manejar solicitudes sin archivos adjuntos mostrando estado vacío amigable', () => {

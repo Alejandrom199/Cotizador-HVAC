@@ -9,6 +9,9 @@
         </div>
       </div>
       <div class="actions-row" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;flex-shrink:0">
+        @if (isEngineeringUnassigned()) {
+          <button class="btn btn-primary" type="button" (click)="take()"><app-icon name="take" /> Tomar solicitud para editar</button>
+        }
         @if (canSend()) {
           <button class="btn btn-primary" type="button" (click)="workspace.sendQuote(q.id)"><app-icon name="send" /> Enviar</button>
         }
@@ -26,90 +29,239 @@
     </div>
 
     @if (tab() === 'resumen' && pricing(); as p) {
-      <div class="stage-track">
-        @for (s of [{i:1,l:'Revisión'},{i:2,l:'Planos'},{i:3,l:'Cálculos'},{i:4,l:'Cotización'}]; track s.i) {
-          <div class="stage-step" [class.done]="stageKind(s.i)==='done'" [class.current]="stageKind(s.i)==='current'" [class.pending]="stageKind(s.i)==='pending'">
-            <div class="stage-num">{{ s.i < 10 ? '0' + s.i : s.i }}</div>
-            <div>
-              <div class="n">Etapa {{ s.i }}</div>
-              <strong>{{ s.l }}</strong>
+      @if (isEngineeringUnassigned()) {
+        <div class="message-strip warn" style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <div class="k"><app-icon name="take" /> Solicitud técnica en bandeja sin asignar</div>
+            <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.</p>
+          </div>
+          <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
+            <app-icon name="take" /> Tomar solicitud para editar
+          </button>
+        </div>
+
+        <div class="summary-grid">
+          <div class="card card-lg" style="grid-column: span 2">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid var(--em-line);padding-bottom:12px">
+              <div class="section-title" style="margin:0">Ficha Informativa del Proyecto / Solicitud</div>
+              <span class="stock warn" style="font-weight:700">Sin Asignar</span>
+            </div>
+            <div class="kv-list">
+              <div>
+                <div class="k">Proyecto</div>
+                <div class="v">{{ q.name }}</div>
+              </div>
+              <div>
+                <div class="k">Código</div>
+                <div class="v num">{{ q.code }}</div>
+              </div>
+              <div>
+                <div class="k">Cliente</div>
+                <div class="v">{{ q.cliente }}</div>
+              </div>
+              <div>
+                <div class="k">RUC / Identificación</div>
+                <div class="v num">{{ q.ruc || '—' }}</div>
+              </div>
+              <div>
+                <div class="k">Ciudad</div>
+                <div class="v">{{ clientCity() }}</div>
+              </div>
+              <div>
+                <div class="k">Tipo de servicio</div>
+                <div class="v">{{ q.tipo }} / {{ q.subtipo }}</div>
+              </div>
+              <div>
+                <div class="k">Prioridad</div>
+                <div class="v">
+                  <span class="stock" [class.bad]="q.prio==='Alta'" [class.ok]="q.prio==='Baja'" [class.warn]="q.prio==='Media'">{{ q.prio }}</span>
+                </div>
+              </div>
+              <div>
+                <div class="k">Vendedor responsable</div>
+                <div class="v">{{ q.vendedor || '—' }}</div>
+              </div>
+              <div>
+                <div class="k">Fecha de recepción</div>
+                <div class="v">{{ q.fecha || '—' }}</div>
+              </div>
+              <div>
+                <div class="k">Compromiso de entrega</div>
+                <div class="v num" style="color:var(--em-accent)">{{ slaView()?.promised }}</div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--em-line)">
+              <div class="k" style="font-size:11px;color:var(--em-muted);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px">Observaciones comerciales</div>
+              <p style="font-size:13.5px;color:var(--em-ink);background:#f8fafc;padding:12px 14px;border-radius:var(--em-radius);border:1px solid var(--em-line);line-height:1.5;margin:0">
+                {{ q.observaciones || 'Sin observaciones comerciales adicionales registradas.' }}
+              </p>
+            </div>
+
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--em-line)">
+              <div class="k" style="font-size:11px;color:var(--em-muted);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:8px">Planos y documentos adjuntos</div>
+              @if (q.adjuntos && q.adjuntos.length > 0) {
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  @for (file of q.adjuntos; track file.name) {
+                    <div class="file-row" style="margin-top:0">
+                      <app-icon name="files" style="color:var(--em-accent);flex-shrink:0" />
+                      <div class="file-name-wrap">
+                        <span class="file-name-faded" [title]="file.name">{{ file.name }}</span>
+                      </div>
+                      <span class="file-size num">{{ formatFileSize(file.size) }}</span>
+                      <span class="file-ext">{{ file.ext }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="muted" style="font-size:13px;margin:0">Sin planos o documentos adjuntos en esta solicitud.</p>
+              }
             </div>
           </div>
-        }
-      </div>
-      <div class="summary-grid">
-        <div class="card card-lg">
-          <div class="section-title">Datos del proyecto</div>
-          <div class="kv-list">
-            <div>
-              <div class="k">Cliente</div>
-              <div class="v">{{ q.cliente }}</div>
+
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div class="card card-lg" style="background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);border-color:#bae6fd">
+              <div class="section-title" style="color:#0369a1">Acción requerida</div>
+              <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">
+                Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.
+              </p>
+              <button class="btn btn-primary" type="button" (click)="take()" style="width:100%;height:46px;justify-content:center;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(2,132,199,0.35);margin-bottom:12px">
+                <app-icon name="take" /> Tomar solicitud para editar
+              </button>
+              <div class="kv-list" style="margin-top:8px;grid-template-columns:1fr;gap:8px">
+                <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--em-line);padding-bottom:6px">
+                  <span class="k" style="margin:0">SLA Estimado</span>
+                  <span class="v num" style="margin:0">{{ slaView()?.slaLabel }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--em-line);padding-bottom:6px">
+                  <span class="k" style="margin:0">Equivale a</span>
+                  <span class="v" style="margin:0">{{ slaView()?.daysLabel }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between">
+                  <span class="k" style="margin:0">Entrega Estimada</span>
+                  <span class="v num" style="margin:0;color:var(--em-accent)">{{ slaView()?.promised }}</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <div class="k">Área total</div>
-              <div class="v num">{{ workspace.areaOf(q) ? workspace.areaOf(q).toFixed(1) + ' m²' : '—' }}</div>
-            </div>
-            <div>
-              <div class="k">Tipo de servicio</div>
-              <div class="v">{{ q.tipo }} / {{ q.subtipo }}</div>
-            </div>
-            <div>
-              <div class="k">Plantilla base</div>
-              <div class="v">{{ template()?.name || q.plantilla }}</div>
-            </div>
-            <div>
-              <div class="k">Prioridad</div>
-              <div class="v">{{ q.prio }}</div>
-            </div>
-            <div>
-              <div class="k">Líneas cotizadas</div>
-              <div class="v num">{{ q.elements.length }}</div>
+
+            <div class="card card-lg">
+              <div class="section-title">Descargar reportes</div>
+              <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico de la solicitud.</p>
+              <div class="report-buttons-group" style="display:flex;flex-direction:column;gap:10px;width:100%">
+                <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                  <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                    <app-icon name="report-final" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                    <span style="font-weight:600;font-size:13.5px">Informe final (PDF)</span>
+                  </span>
+                </button>
+                <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                  <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                    <app-icon name="report-detail" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                    <span style="font-weight:600;font-size:13.5px">Informe detallado</span>
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="card card-lg">
-          <div class="section-title">Descargar reportes</div>
-          <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico completo de ingeniería.</p>
-          <div class="report-buttons-group" style="display:flex;flex-direction:column;gap:10px;width:100%">
-            <div style="width:100%">
-              <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
-                <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
-                  <app-icon name="report-final" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
-                  <span style="font-weight:600;font-size:13.5px">Informe final (PDF)</span>
-                </span>
-              </button>
+      } @else {
+        <div class="stage-track">
+          @for (s of [{i:1,l:'Revisión'},{i:2,l:'Planos'},{i:3,l:'Cálculos'},{i:4,l:'Cotización'}]; track s.i) {
+            <div class="stage-step" [class.done]="stageKind(s.i)==='done'" [class.current]="stageKind(s.i)==='current'" [class.pending]="stageKind(s.i)==='pending'">
+              <div class="stage-num">{{ s.i < 10 ? '0' + s.i : s.i }}</div>
+              <div>
+                <div class="n">Etapa {{ s.i }}</div>
+                <strong>{{ s.l }}</strong>
+              </div>
             </div>
-            <div style="width:100%">
-              <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
-                <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
-                  <app-icon name="report-detail" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
-                  <span style="font-weight:600;font-size:13.5px">Informe detallado</span>
-                </span>
-              </button>
+          }
+        </div>
+        <div class="summary-grid">
+          <div class="card card-lg">
+            <div class="section-title">Datos del proyecto</div>
+            <div class="kv-list">
+              <div>
+                <div class="k">Cliente</div>
+                <div class="v">{{ q.cliente }}</div>
+              </div>
+              <div>
+                <div class="k">Área total</div>
+                <div class="v num">{{ workspace.areaOf(q) ? workspace.areaOf(q).toFixed(1) + ' m²' : '—' }}</div>
+              </div>
+              <div>
+                <div class="k">Tipo de servicio</div>
+                <div class="v">{{ q.tipo }} / {{ q.subtipo }}</div>
+              </div>
+              <div>
+                <div class="k">Plantilla base</div>
+                <div class="v">{{ template()?.name || q.plantilla }}</div>
+              </div>
+              <div>
+                <div class="k">Prioridad</div>
+                <div class="v">{{ q.prio }}</div>
+              </div>
+              <div>
+                <div class="k">Líneas cotizadas</div>
+                <div class="v num">{{ q.elements.length }}</div>
+              </div>
             </div>
           </div>
+          <div class="card card-lg">
+            <div class="section-title">Descargar reportes</div>
+            <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">Genera la propuesta formal para el cliente o el desglose técnico completo de ingeniería.</p>
+            <div class="report-buttons-group" style="display:flex;flex-direction:column;gap:10px;width:100%">
+              <div style="width:100%">
+                <button class="btn btn-primary" type="button" (click)="workspace.exportFinalReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                  <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                    <app-icon name="report-final" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                    <span style="font-weight:600;font-size:13.5px">Informe final (PDF)</span>
+                  </span>
+                </button>
+              </div>
+              <div style="width:100%">
+                <button class="btn" type="button" (click)="workspace.exportDetailedReport(q.id)" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;padding:0 16px;box-sizing:border-box">
+                  <span style="display:inline-flex;align-items:center;gap:10px;width:175px;text-align:left">
+                    <app-icon name="report-detail" style="width:18px;text-align:center;font-size:15px;flex-shrink:0" />
+                    <span style="font-weight:600;font-size:13.5px">Informe detallado</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
         </div>
-        <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
-      </div>
+      }
     }
 
     @if (tab() === 'calculo' && pricing(); as p) {
       <div class="calc-layout">
         <div>
-          <div class="message-strip">
-            <div class="k"><app-icon name="info" /> Motor de cálculo HVAC</div>
-            <p>Sustituye las hojas Excel de capacidad y ductos. Sugiere equipos según área, uso y plantilla (BTU y CFM).</p>
-          </div>
+          @if (isEngineeringUnassigned()) {
+            <div class="message-strip warn" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:280px">
+                <div class="k"><app-icon name="take" /> Modo Informativo — Solicitud sin asignar</div>
+                <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.</p>
+              </div>
+              <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
+                <app-icon name="take" /> Tomar solicitud para editar
+              </button>
+            </div>
+          } @else {
+            <div class="message-strip">
+              <div class="k"><app-icon name="info" /> Motor de cálculo HVAC</div>
+              <p>Sustituye las hojas Excel de capacidad y ductos. Sugiere equipos según área, uso y plantilla (BTU y CFM).</p>
+            </div>
+          }
           <div class="calc-toolbar">
             <div class="calc-tpl">
               <label class="field">Plantilla paramétrica</label>
-              <select class="select" [ngModel]="q.plantilla" (ngModelChange)="setPlantilla($event)">
+              <select class="select" [ngModel]="q.plantilla" [disabled]="isEngineeringUnassigned()" (ngModelChange)="setPlantilla($event)">
                 @for (t of templates(); track t.code) {
                   <option [value]="t.code">{{ t.name }} — {{ t.sub }}</option>
                 }
               </select>
             </div>
-            <button class="btn" type="button" (click)="workspace.addRoom(q.id)"><app-icon name="add" /> Ambiente</button>
+            <button class="btn" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.addRoom(q.id)"><app-icon name="add" /> Ambiente</button>
           </div>
           <div class="table">
             <div class="thead cols-calc">
@@ -118,9 +270,9 @@
             @for (r of q.rooms; track r.id) {
               @let th = workspace.thermal(r, q);
               <div class="trow static cols-calc">
-                <input class="input" [ngModel]="r.name" (ngModelChange)="workspace.patchRoom(q.id, r.id, {name:$event})" />
-                <input class="input num" type="number" [ngModel]="r.area" (ngModelChange)="workspace.patchRoom(q.id, r.id, {area:+$event})" />
-                <select class="select" [ngModel]="r.tipo" (ngModelChange)="workspace.patchRoom(q.id, r.id, {tipo:$event})">
+                <input class="input" [disabled]="isEngineeringUnassigned()" [ngModel]="r.name" (ngModelChange)="workspace.patchRoom(q.id, r.id, {name:$event})" />
+                <input class="input num" type="number" [disabled]="isEngineeringUnassigned()" [ngModel]="r.area" (ngModelChange)="workspace.patchRoom(q.id, r.id, {area:+$event})" />
+                <select class="select" [disabled]="isEngineeringUnassigned()" [ngModel]="r.tipo" (ngModelChange)="workspace.patchRoom(q.id, r.id, {tipo:$event})">
                   <option [value]="RoomKind.Comercial">Comercial</option>
                   <option [value]="RoomKind.Critico">Crítico</option>
                   <option [value]="RoomKind.Residencial">Residencial</option>
@@ -128,7 +280,12 @@
                 <span class="num">{{ th.nominal.toLocaleString('en-US') }}</span>
                 <span class="num">{{ th.cfm.toLocaleString('en-US') }}</span>
                 <span>{{ equipoName(th.equipo) }}</span>
-                <button class="btn btn-ghost" type="button" (click)="workspace.removeRoom(q.id, r.id)"><app-icon name="trash" size="sm" /></button>
+                <button class="btn btn-ghost" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.removeRoom(q.id, r.id)"><app-icon name="trash" size="sm" /></button>
+              </div>
+            }
+            @if (!q.rooms.length) {
+              <div class="trow static cols-calc" style="grid-column: 1 / -1; justify-content: center; padding: 20px;">
+                <span class="muted">Sin ambientes definidos. @if (isEngineeringUnassigned()) { Toma la solicitud para agregar ambientes y calcular cargas. } @else { Haz clic en "+ Ambiente" para dimensionar. }</span>
               </div>
             }
             <div class="trow static cols-calc calc-total">
@@ -142,7 +299,10 @@
             </div>
           </div>
           <div class="actions-row" style="justify-content:flex-start">
-            <button class="btn btn-primary" type="button" (click)="applyTpl()"><app-icon name="templates" /> Aplicar plantilla y generar materiales</button>
+            <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="applyTpl()"><app-icon name="templates" /> Aplicar plantilla y generar materiales</button>
+            @if (isEngineeringUnassigned()) {
+              <button class="btn btn-green" type="button" (click)="take()"><app-icon name="take" /> Tomar solicitud</button>
+            }
           </div>
         </div>
         <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
@@ -275,35 +435,47 @@
     @if (tab() === 'reajuste' && pricing(); as p) {
       <div class="calc-layout">
         <div>
+          @if (isEngineeringUnassigned()) {
+            <div class="message-strip warn" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:280px">
+                <div class="k"><app-icon name="take" /> Modo Informativo — Reajustes Comerciales</div>
+                <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para registrar reajustes comerciales, primero debes tomar la solicitud.</p>
+              </div>
+              <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
+                <app-icon name="take" /> Tomar solicitud para editar
+              </button>
+            </div>
+          }
+
           <div class="card card-lg" style="margin-bottom:16px">
-            <div class="section-title">Ajustes comerciales</div>
+            <div class="section-title">Ajustes comerciales aplicados</div>
             <p class="muted" style="margin-bottom:16px">
-              Modifica los porcentajes por categoría. El margen se recalcula en tiempo real con límite máximo de {{ maxDisc() }}%.
+              Modifica los porcentajes por categoría. El margen se recalcula en tiempo real respetando los límites autorizados por Gerencia en las políticas de reajuste.
             </p>
             <div class="disc-grid">
               <div class="card" style="box-shadow:none">
                 <div class="disc-head">
-                  <span class="field" style="margin:0">Insumos</span>
+                  <span class="field" style="margin:0">Insumos & Materiales</span>
                   <span class="num disc-val" [class.on]="q.descInsumos !== 0">{{ workspace.discLabel(q.descInsumos) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Insumos, $event)" />
-                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+                <input class="range" type="range" [disabled]="isEngineeringUnassigned()" [min]="-maxDiscountFor(DiscountCategory.Insumos)" [max]="maxSurchargeFor(DiscountCategory.Insumos)" [step]="1" [ngModel]="q.descInsumos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Insumos, $event)" />
+                <div class="disc-scale"><span>-{{ maxDiscountFor(DiscountCategory.Insumos) }}%</span><span>0%</span><span>+{{ maxSurchargeFor(DiscountCategory.Insumos) }}%</span></div>
               </div>
               <div class="card" style="box-shadow:none">
                 <div class="disc-head">
-                  <span class="field" style="margin:0">Equipos</span>
+                  <span class="field" style="margin:0">Equipos HVAC</span>
                   <span class="num disc-val" [class.on]="q.descEquipos !== 0">{{ workspace.discLabel(q.descEquipos) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Equipos, $event)" />
-                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+                <input class="range" type="range" [disabled]="isEngineeringUnassigned()" [min]="-maxDiscountFor(DiscountCategory.Equipos)" [max]="maxSurchargeFor(DiscountCategory.Equipos)" [step]="1" [ngModel]="q.descEquipos" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.Equipos, $event)" />
+                <div class="disc-scale"><span>-{{ maxDiscountFor(DiscountCategory.Equipos) }}%</span><span>0%</span><span>+{{ maxSurchargeFor(DiscountCategory.Equipos) }}%</span></div>
               </div>
               <div class="card" style="box-shadow:none">
                 <div class="disc-head">
-                  <span class="field" style="margin:0">Mano de obra</span>
+                  <span class="field" style="margin:0">Mano de Obra & Técnicos</span>
                   <span class="num disc-val" [class.on]="q.descMO !== 0">{{ workspace.discLabel(q.descMO) }}</span>
                 </div>
-                <input class="range" type="range" [min]="-maxDisc()" [max]="maxDisc()" [step]="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.ManoDeObra, $event)" />
-                <div class="disc-scale"><span>-{{ maxDisc() }}%</span><span>0%</span><span>+{{ maxDisc() }}%</span></div>
+                <input class="range" type="range" [disabled]="isEngineeringUnassigned()" [min]="-maxDiscountFor(DiscountCategory.ManoDeObra)" [max]="maxSurchargeFor(DiscountCategory.ManoDeObra)" [step]="1" [ngModel]="q.descMO" (ngModelChange)="workspace.setDiscount(q.id, DiscountCategory.ManoDeObra, $event)" />
+                <div class="disc-scale"><span>-{{ maxDiscountFor(DiscountCategory.ManoDeObra) }}%</span><span>0%</span><span>+{{ maxSurchargeFor(DiscountCategory.ManoDeObra) }}%</span></div>
               </div>
             </div>
             <div class="message-strip" [class.ok]="!p.bajoPiso" [class.warn]="p.bajoPiso" style="margin-top:16px">
@@ -311,7 +483,7 @@
               <p>Costo directo {{ money(p.costo) }}. Piso de venta (margen mín. {{ q.margenMin }}%): {{ money(p.piso) }}. Venta actual: {{ money(p.base) }}.</p>
             </div>
             <div style="display:flex;justify-content:flex-end;margin-top:16px">
-              <button class="btn btn-primary" type="button" (click)="workspace.logAdjustment(q.id)"><app-icon name="adjust" /> Registrar ajuste en bitácora</button>
+              <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.logAdjustment(q.id)"><app-icon name="adjust" /> Registrar ajuste en bitácora</button>
             </div>
           </div>
           <div class="card card-lg">

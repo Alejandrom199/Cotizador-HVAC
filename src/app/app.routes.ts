@@ -156,6 +156,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/approval/pages/approval-page/approval-page').then((m) => m.ApprovalPage),
       },
+      {
+        path: 'parametros',
+        loadComponent: () =>
+          import('./features/settings/pages/discount-settings-page/discount-settings-page').then(
+            (m) => m.DiscountSettingsPage,
+          ),
+      },
     ],
   },
   { path: '**', redirectTo: 'inicio' },

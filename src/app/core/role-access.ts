@@ -67,6 +67,12 @@ const NAV_BY_ROLE: Record<UserRole, NavGroup[]> = {
         { href: AppRoutes.Aprobaciones, icon: 'approve', label: 'Aprobación de solicitud', badge: NavBadgeType.Aprobaciones },
       ],
     },
+    {
+      label: 'CONFIGURACIÓN',
+      items: [
+        { href: AppRoutes.Parametros, icon: 'adjust', label: 'Políticas de Reajuste' },
+      ],
+    },
   ],
 };
 

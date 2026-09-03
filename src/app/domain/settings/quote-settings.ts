@@ -1,4 +1,4 @@
-import { ComplexityTier, RoomKind, SlaStageName } from '../enums';
+import { ComplexityTier, RoomKind, SlaStageName, DiscountCategory } from '../enums';
 
 export interface ComplexityBand {
   maxScore: number;
@@ -13,6 +13,14 @@ export interface StageWeight {
   w: number;
 }
 
+export interface DiscountCategoryParam {
+  category: DiscountCategory;
+  name: string;
+  maxDiscountPct: number;
+  maxSurchargePct: number;
+  description: string;
+}
+
 export interface QuoteSettings {
   ivaRate: number;
   defaultMarginInstall: number;
@@ -20,6 +28,7 @@ export interface QuoteSettings {
   hoursPerBusinessDay: number;
   offerValidityDays: number;
   maxDiscountPct: number;
+  categoryDiscountParams: Record<DiscountCategory, DiscountCategoryParam>;
   roomTypeMultiplier: Record<RoomKind, number>;
   defaultTemplateFactorBtu: number;
   cfmPerTon: number;
@@ -71,6 +80,29 @@ export const DEFAULT_QUOTE_SETTINGS: QuoteSettings = {
   hoursPerBusinessDay: 8,
   offerValidityDays: 15,
   maxDiscountPct: 40,
+  categoryDiscountParams: {
+    [DiscountCategory.Insumos]: {
+      category: DiscountCategory.Insumos,
+      name: 'Insumos & Materiales',
+      maxDiscountPct: 30,
+      maxSurchargePct: 40,
+      description: 'Ductería, tubería de cobre, aislamiento, gas y accesorios de montaje',
+    },
+    [DiscountCategory.Equipos]: {
+      category: DiscountCategory.Equipos,
+      name: 'Equipos HVAC',
+      maxDiscountPct: 15,
+      maxSurchargePct: 30,
+      description: 'Condensadoras, evaporadoras, splits y unidades centrales',
+    },
+    [DiscountCategory.ManoDeObra]: {
+      category: DiscountCategory.ManoDeObra,
+      name: 'Mano de Obra & Técnicos',
+      maxDiscountPct: 35,
+      maxSurchargePct: 50,
+      description: 'Horas de instalación, pruebas de presión, vacío y puesta en marcha',
+    },
+  },
   roomTypeMultiplier: {
     [RoomKind.Critico]: 1.25,
     [RoomKind.Comercial]: 1,

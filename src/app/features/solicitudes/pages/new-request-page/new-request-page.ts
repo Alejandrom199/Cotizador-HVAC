@@ -113,6 +113,9 @@ export class NewRequestPage {
 
   setTipo(tipo: QuoteKind): void {
     this.tipo.set(tipo);
+    if (tipo === QuoteKind.Mantenimiento) {
+      this.files.set([]);
+    }
     this.subtipo.set(
       tipo === QuoteKind.Mantenimiento
         ? 'Correctivo'
@@ -125,6 +128,11 @@ export class NewRequestPage {
 
   onFiles(event: Event): void {
     const input = event.target as HTMLInputElement;
+    if (this.tipo() === QuoteKind.Mantenimiento) {
+      this.toast.show('Los servicios de mantenimiento no requieren planos');
+      input.value = '';
+      return;
+    }
     const incoming = [...(input.files ?? [])];
     const add: DraftFile[] = [];
     incoming.forEach((file) => {
@@ -191,6 +199,7 @@ export class NewRequestPage {
       this.toast.show('El cliente no está registrado. Complétalo para continuar.');
       return;
     }
+    const isMaint = this.tipo() === QuoteKind.Mantenimiento;
     const created = this.workspace.createFromRequest({
       ruc: this.selectedRuc()!,
       cliente: this.cliente(),
@@ -199,7 +208,7 @@ export class NewRequestPage {
       subtipo: this.subtipo(),
       prio: this.prio(),
       observaciones: this.observaciones(),
-      adjuntos: this.files().map((f) => ({ name: f.name, size: f.size, ext: f.ext })),
+      adjuntos: isMaint ? [] : this.files().map((f) => ({ name: f.name, size: f.size, ext: f.ext })),
     });
     if (created) {
       void this.router.navigateByUrl('/solicitudes');
@@ -207,6 +216,7 @@ export class NewRequestPage {
   }
 
   exportPdf(): void {
+    const isMaint = this.tipo() === QuoteKind.Mantenimiento;
     const ok = this.printer.printRequest({
       cliente: this.cliente(),
       ruc: this.ruc(),
@@ -214,7 +224,7 @@ export class NewRequestPage {
       tipo: this.tipo() + (this.tipo() === QuoteKind.Instalacion ? ' - ' + this.subtipo() : ''),
       prio: this.prio(),
       observaciones: this.observaciones(),
-      files: this.files(),
+      files: isMaint ? [] : this.files(),
       ivaRate: this.workspace.settings.ivaRate,
     });
     this.toast.show(ok ? 'Generando PDF de la solicitud...' : 'Permite ventanas emergentes para exportar');

@@ -191,4 +191,15 @@ describe('computePricing', () => {
     expect(up.total).toBeGreaterThan(zero.total);
     expect(up.base - zero.base).toBeCloseTo(48 * 5.1 * 0.1, 2);
   });
+
+  it('categoryDiscountParams tiene configurados limites comerciales para Insumos, Equipos y Mano de Obra', () => {
+    const params = settings.categoryDiscountParams;
+    expect(params).toBeDefined();
+    expect(params.descInsumos.maxDiscountPct).toBe(30);
+    expect(params.descInsumos.maxSurchargePct).toBe(40);
+    expect(params.descEquipos.maxDiscountPct).toBe(15);
+    expect(params.descEquipos.maxSurchargePct).toBe(30);
+    expect(params.descMO.maxDiscountPct).toBe(35);
+    expect(params.descMO.maxSurchargePct).toBe(50);
+  });
 });

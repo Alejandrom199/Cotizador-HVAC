@@ -1,11 +1,11 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { Quote } from '../domain/models/quote.model';
 import { QuoteLine } from '../domain/models/quote-line.model';
 import { Room } from '../domain/models/room.model';
 import { Client } from '../domain/models/client.model';
 import { Product } from '../domain/models/product.model';
 import { SystemTemplate } from '../domain/models/template.model';
-import { QuoteSettings } from '../domain/settings/quote-settings';
+import { QuoteSettings, DiscountCategoryParam } from '../domain/settings/quote-settings';
 import {
   CLIENT_REPOSITORY,
   PRODUCT_REPOSITORY,
@@ -474,6 +474,7 @@ export class QuoteWorkspaceService {
       input.tipo === QuoteKind.Mantenimiento
         ? 'Correctivo'
         : input.subtipo || InstallationSubtype.Completa;
+    const adjuntos = input.tipo === QuoteKind.Mantenimiento ? [] : input.adjuntos;
     const quote: Quote = {
       id: nid,
       code: 'COT-2026-' + nid.slice(2),
@@ -504,7 +505,7 @@ export class QuoteWorkspaceService {
           : this.settings.defaultMarginInstall,
       log: [],
       observaciones: input.observaciones,
-      adjuntos: input.adjuntos,
+      adjuntos,
     };
     this.quotesRepo.upsert(quote);
     this.toast.show('Solicitud ' + quote.code + ' registrada');
@@ -596,9 +597,43 @@ export class QuoteWorkspaceService {
     this.quotesRepo.upsert({ ...quote, ...patch });
   }
 
+  readonly discountParams = computed(() => Object.values(this.settings.categoryDiscountParams));
+
+  discountParam(category: DiscountCategory): DiscountCategoryParam {
+    return (
+      this.settings.categoryDiscountParams?.[category] ?? {
+        category,
+        name: category,
+        maxDiscountPct: this.settings.maxDiscountPct,
+        maxSurchargePct: this.settings.maxDiscountPct,
+        description: '',
+      }
+    );
+  }
+
+  maxDiscountFor(category: DiscountCategory): number {
+    return this.discountParam(category).maxDiscountPct;
+  }
+
+  maxSurchargeFor(category: DiscountCategory): number {
+    return this.discountParam(category).maxSurchargePct;
+  }
+
+  updateDiscountParam(category: DiscountCategory, maxDiscountPct: number, maxSurchargePct: number): void {
+    const current = this.discountParam(category);
+    this.settings.categoryDiscountParams[category] = {
+      ...current,
+      maxDiscountPct: Math.max(0, maxDiscountPct),
+      maxSurchargePct: Math.max(0, maxSurchargePct),
+    };
+    this.toast.show(`Parámetros de reajuste para ${current.name} actualizados`);
+  }
+
   setDiscount(id: string, field: DiscountCategory, value: number): void {
-    const max = this.settings.maxDiscountPct;
-    const clamped = Math.max(-max, Math.min(max, value || 0));
+    const param = this.discountParam(field);
+    const min = -param.maxDiscountPct;
+    const max = param.maxSurchargePct;
+    const clamped = Math.max(min, Math.min(max, value || 0));
     this.patchQuote(id, { [field]: clamped });
   }
 

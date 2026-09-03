@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="kicker">Gerencia & Dirección Comercial</div>
+      <h1>Políticas y Parámetros de Reajuste</h1>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" type="button" (click)="resetDefaults()">
+        <app-icon name="activate" /> Restaurar por defecto
+      </button>
+      <button class="btn btn-primary" type="button" (click)="save()">
+        <app-icon name="save" /> Guardar políticas
+      </button>
+    </div>
+  </div>
+
+  <div class="card card-lg" style="margin-bottom:24px">
+    <div class="section-title">Límites Comerciales por Categoría de Producto</div>
+    <p class="muted" style="margin-bottom:20px">
+      Define los porcentajes máximos de descuento (reducción de precio) y recargo (incremento de precio) que los asesores de ventas e ingenieros pueden aplicar al reajustar cotizaciones. Los cambios aplican de inmediato en todo el sistema.
+    </p>
+
+    <div class="table">
+      <div class="thead" style="grid-template-columns: 1.8fr 1.2fr 1.2fr 2.4fr">
+        <span>Categoría Comercial</span>
+        <span style="text-align:center">Máx. Descuento (%)</span>
+        <span style="text-align:center">Máx. Recargo (%)</span>
+        <span>Alcance y Sensibilidad</span>
+      </div>
+      @for (p of params(); track p.category) {
+        <div class="trow static" style="grid-template-columns: 1.8fr 1.2fr 1.2fr 2.4fr; align-items: center">
+          <div>
+            <strong>{{ p.name }}</strong>
+            <div class="muted num" style="font-size:12px">{{ p.category }}</div>
+          </div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:6px">
+            <span class="muted">-</span>
+            <input
+              class="input num"
+              type="number"
+              min="0"
+              max="100"
+              style="width:80px;text-align:center"
+              [(ngModel)]="p.maxDiscountPct"
+            />
+            <span class="muted">%</span>
+          </div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:6px">
+            <span class="muted">+</span>
+            <input
+              class="input num"
+              type="number"
+              min="0"
+              max="100"
+              style="width:80px;text-align:center"
+              [(ngModel)]="p.maxSurchargePct"
+            />
+            <span class="muted">%</span>
+          </div>
+          <div class="muted" style="font-size:12.5px;line-height:1.4">
+            {{ p.description }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card card-lg">
+    <div class="section-title">Gobernanza y Reglas de Negocio</div>
+    <div class="kv-list" style="margin-top:12px">
+      <div>
+        <div class="k">Control de Piso de Venta</div>
+        <div class="v">Si un reajuste sitúa la cotización por debajo del margen mínimo (piso de venta), el sistema alerta automáticamente para revisión obligatoria de Gerencia.</div>
+      </div>
+      <div>
+        <div class="k">Bitácora de Auditoría</div>
+        <div class="v">Cada ajuste aplicado queda registrado en la bitácora con usuario, fecha exacta y cálculo del nuevo margen comercial resultante.</div>
+      </div>
+      <div>
+        <div class="k">Acceso Exclusivo</div>
+        <div class="v">Esta matriz de parametrización solo es accesible y modificable por perfiles con rol de Gerencia General.</div>
+      </div>
+    </div>
+  </div>
+</div>

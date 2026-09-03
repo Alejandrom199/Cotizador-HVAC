@@ -16,6 +16,7 @@ export const AppRoutes = {
   Rendimiento: '/rendimiento',
   Metricas: '/rendimiento',
   Compras: '/compras',
+  Parametros: '/parametros',
 } as const;
 
 export type AppRoutes = (typeof AppRoutes)[keyof typeof AppRoutes];

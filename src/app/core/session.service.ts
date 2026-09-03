@@ -50,6 +50,14 @@ export class SessionService {
     return this.role() === UserRole.Ventas;
   }
 
+  isEngineering(): boolean {
+    return this.role() === UserRole.Ingenieria;
+  }
+
+  isManagement(): boolean {
+    return this.role() === UserRole.Gerencia;
+  }
+
   setRole(role: UserRole): void {
     this.role.set(role);
     try {

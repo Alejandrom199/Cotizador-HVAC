@@ -58,22 +58,29 @@
 
     <div class="card card-lg form-card">
       <div class="section-title"><app-icon name="files" size="sm" /> Carga de archivos</div>
-      <div class="dropzone dropzone-fill">
-        <app-icon name="upload" size="lg" />
-        <div style="margin-top:8px;font-weight:600">Subir planos o documentos técnicos</div>
-        <div class="muted" style="margin:4px 0 12px">Formatos: PDF, DWG, JPG (máx. 10 MB)</div>
-        <label class="btn btn-sm"><app-icon name="upload" /> Examinar archivos
-          <input type="file" multiple accept=".pdf,.dwg,.jpg,.jpeg,.png" hidden (change)="onFiles($event)" />
-        </label>
-      </div>
-      @for (f of files(); track f.id) {
-        <div class="file-row">
-          <span class="file-ext">{{ f.ext }}</span>
-          <div class="file-name-wrap">
-            <span class="file-name-faded" [title]="f.name">{{ f.name }}</span>
+      @if (tipo() === QuoteKind.Instalacion) {
+        <div class="dropzone dropzone-fill">
+          <app-icon name="upload" size="lg" />
+          <div style="margin-top:8px;font-weight:600">Subir planos o documentos técnicos</div>
+          <div class="muted" style="margin:4px 0 12px">Formatos: PDF, DWG, JPG (máx. 10 MB)</div>
+          <label class="btn btn-sm"><app-icon name="upload" /> Examinar archivos
+            <input type="file" multiple accept=".pdf,.dwg,.jpg,.jpeg,.png" hidden (change)="onFiles($event)" />
+          </label>
+        </div>
+        @for (f of files(); track f.id) {
+          <div class="file-row">
+            <span class="file-ext">{{ f.ext }}</span>
+            <div class="file-name-wrap">
+              <span class="file-name-faded" [title]="f.name">{{ f.name }}</span>
+            </div>
+            <span class="file-size num">{{ f.sizeStr || formatFileSize(f.size) }}</span>
+            <button class="btn btn-ghost" type="button" (click)="files.update(list => list.filter(x => x.id !== f.id))"><app-icon name="trash" size="sm" /></button>
           </div>
-          <span class="file-size num">{{ f.sizeStr || formatFileSize(f.size) }}</span>
-          <button class="btn btn-ghost" type="button" (click)="files.update(list => list.filter(x => x.id !== f.id))"><app-icon name="trash" size="sm" /></button>
+        }
+      } @else {
+        <div class="message-strip" style="margin-top:8px">
+          <div class="k"><app-icon name="info" /> No requiere planos de obra</div>
+          <p>Para servicios de mantenimiento no se requiere la carga de planos arquitectónicos ni documentos técnicos de obra civil.</p>
         </div>
       }
     </div>
