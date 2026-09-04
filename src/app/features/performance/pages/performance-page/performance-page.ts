@@ -3,14 +3,16 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { STAFF_REPOSITORY } from '@app/domain/ports/tokens';
 import { QuoteStatus } from '@app/domain/enums/quote-status.enum';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-performance-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './performance-page.html',
 })
 export class PerformancePage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Rendimiento Técnico' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly staff = inject(STAFF_REPOSITORY);
 

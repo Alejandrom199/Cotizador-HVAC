@@ -8,6 +8,8 @@ import { Quote } from '@app/domain/models/quote.model';
 import { kindTag, priorityClass, statusClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
 
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
+
 const FILTERS = [
   'Todas',
   QuoteStatus.Elaboracion,
@@ -21,10 +23,11 @@ const FILTERS = [
 @Component({
   selector: 'app-solicitudes-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './solicitudes-page.html',
 })
 export class SolicitudesPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Solicitudes' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly session = inject(SessionService);
   private readonly createFlow = inject(CreateFlowService);

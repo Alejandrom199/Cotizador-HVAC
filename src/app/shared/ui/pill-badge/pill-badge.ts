@@ -20,24 +20,23 @@ export type PillBadgeTone = 'ok' | 'warn' | 'bad' | 'info' | 'neutral' | 'accent
       align-items: center;
     }
     .pill-badge {
-      width: 112px;
-      height: 26px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       font-size: 11.5px;
-      font-weight: 700;
-      border-radius: 9999px;
+      font-weight: 600;
+      border-radius: 4px;
       white-space: nowrap;
       box-sizing: border-box;
-      padding: 0 8px;
+      padding: 2px 8px;
+      height: 22px;
       letter-spacing: 0.01em;
       line-height: 1;
     }
     .pill-badge--ok {
       background: #dcfce7;
-      color: #047857;
+      color: #15803d;
       border: 1px solid #bbf7d0;
     }
     .pill-badge--warn {
@@ -46,19 +45,19 @@ export type PillBadgeTone = 'ok' | 'warn' | 'bad' | 'info' | 'neutral' | 'accent
       border: 1px solid #fde68a;
     }
     .pill-badge--bad {
-      background: #ffe4e6;
-      color: #be123c;
-      border: 1px solid #fecdd3;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
     }
     .pill-badge--info {
       background: #e0f2fe;
-      color: #0284c7;
+      color: #0369a1;
       border: 1px solid #bae6fd;
     }
     .pill-badge--accent {
-      background: #ede9fe;
-      color: #6d28d9;
-      border: 1px solid #ddd6fe;
+      background: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
     }
     .pill-badge--neutral {
       background: #f1f5f9;

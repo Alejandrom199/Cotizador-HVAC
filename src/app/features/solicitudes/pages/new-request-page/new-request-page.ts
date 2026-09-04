@@ -7,6 +7,7 @@ import { ToastService } from '@app/core/toast.service';
 import { QuoteKind, InstallationSubtype, MaintenanceSubtype, Priority, ClientType } from '@app/domain/enums';
 import { Client } from '@app/domain/models/client.model';
 import { Icon, IconName } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 interface DraftFile {
   id: string;
@@ -19,7 +20,7 @@ interface DraftFile {
 @Component({
   selector: 'app-new-request-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './new-request-page.html',
 })
 export class NewRequestPage {
@@ -27,6 +28,11 @@ export class NewRequestPage {
   private readonly printer = inject(PrintService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
+
+  readonly breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Solicitudes', url: '/solicitudes' },
+    { label: 'Nueva solicitud de cotización' },
+  ];
 
   readonly ruc = signal('1791234567001');
   readonly cliente = signal('Afecor Cía. Ltda.');

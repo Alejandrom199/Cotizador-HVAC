@@ -1,5 +1,5 @@
 <div class="page">
-  <p class="crumb"><button type="button" (click)="back()">Elementos</button> / Catálogo</p>
+  <app-breadcrumb [items]="breadcrumbs()" />
   <div class="page-head">
     <div>
       <h1>{{ cat() }}</h1>

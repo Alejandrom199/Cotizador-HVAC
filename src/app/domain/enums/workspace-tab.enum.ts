@@ -1,6 +1,7 @@
 export const WorkspaceTab = {
   Resumen: 'resumen',
   Calculo: 'calculo',
+  Ductos: 'ductos',
   Elementos: 'elementos',
   Tiempos: 'tiempos',
   Reajuste: 'reajuste',

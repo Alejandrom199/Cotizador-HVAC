@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { ProductCategory, AppRoutes } from '@app/domain/enums';
 import { Product } from '@app/domain/models/product.model';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-product-form-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './product-form-page.html',
 })
 export class ProductFormPage {
@@ -20,6 +21,11 @@ export class ProductFormPage {
   readonly cats = Object.values(ProductCategory);
   readonly isNew = !this.route.snapshot.paramMap.get('code');
   readonly codeLocked = signal(!this.isNew);
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    { label: 'Catálogo de Productos', url: '/productos' },
+    { label: this.isNew ? 'Nuevo producto' : (this.name() || this.code()) },
+  ]);
 
   readonly code = signal(this.route.snapshot.paramMap.get('code') ?? '');
   readonly cat = signal<ProductCategory>(ProductCategory.Insumos);

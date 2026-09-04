@@ -1,5 +1,5 @@
 <div class="page">
-  <p class="crumb"><button type="button" (click)="cancel()">Clientes</button> / {{ isNew ? 'Nuevo' : ruc() }}</p>
+  <app-breadcrumb [items]="breadcrumbs()" />
   <div class="page-head">
     <div>
       <h1>{{ isNew ? 'Nuevo cliente' : 'Editar cliente' }}</h1>

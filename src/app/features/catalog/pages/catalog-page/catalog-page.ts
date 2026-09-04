@@ -4,14 +4,16 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { ProductCategory } from '@app/domain/enums/product-category.enum';
 import { stockClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-catalog-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './catalog-page.html',
 })
 export class CatalogPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Catálogo de Productos' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly router = inject(Router);
   readonly filter = signal('Todas');

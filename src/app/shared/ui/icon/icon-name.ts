@@ -55,6 +55,7 @@ export type IconName =
   | 'install'
   | 'maintain'
   | 'elements'
+  | 'ducts'
   | 'check'
   | 'cancel'
   | 'money'

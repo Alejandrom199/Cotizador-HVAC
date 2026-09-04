@@ -5,6 +5,7 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { SystemTemplate } from '@app/domain/models/template.model';
 import { ProductCategory, AppRoutes } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 export interface TemplateItemView {
   code: string;
@@ -16,13 +17,18 @@ export interface TemplateItemView {
 @Component({
   selector: 'app-template-form-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './template-form-page.html',
 })
 export class TemplateFormPage {
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    { label: 'Plantillas Paramétricas', url: '/plantillas' },
+    { label: this.isNew ? 'Nueva plantilla' : (this.name() || this.code()) },
+  ]);
 
   readonly ProductCategory = ProductCategory;
   readonly cats: ProductCategory[] = [

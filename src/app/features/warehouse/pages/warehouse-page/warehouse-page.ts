@@ -3,14 +3,16 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { QuoteStatus, ProductCategory } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 import { PillBadge, PillBadgeTone } from '@app/shared/ui/pill-badge';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-warehouse-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon, PillBadge],
+  imports: [Icon, PillBadge, Breadcrumb],
   templateUrl: './warehouse-page.html',
 })
 export class WarehousePage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Control de Compras & Almacén' }];
   readonly workspace = inject(QuoteWorkspaceService);
   readonly rows = computed(() =>
     this.workspace

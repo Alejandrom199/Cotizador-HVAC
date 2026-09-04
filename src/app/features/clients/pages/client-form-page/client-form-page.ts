@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { Client } from '@app/domain/models/client.model';
 import { ClientType, AppRoutes } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-client-form-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './client-form-page.html',
 })
 export class ClientFormPage {
@@ -19,6 +20,11 @@ export class ClientFormPage {
 
   readonly isNew = !this.route.snapshot.paramMap.get('ruc');
   readonly rucLocked = signal(!this.isNew);
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
+    { label: 'Directorio de Clientes', url: '/clientes' },
+    { label: this.isNew ? 'Nuevo cliente' : (this.name() || this.ruc()) },
+  ]);
   readonly ruc = signal(this.route.snapshot.paramMap.get('ruc') ?? '');
   readonly name = signal('');
   readonly mail = signal('');

@@ -30,6 +30,18 @@ export interface ThermalResult {
   ton: number;
   cfm: number;
   equipo: string;
+  /** Ventilación de aire exterior según ASHRAE 62.1 (CFM) */
+  cfmVentilation: number;
+  /** Ventilación en Litros por segundo (L/s) */
+  litersPerSec: number;
+  /** Ventilación en m³/h */
+  m3PerHour: number;
+  /** Densidad de potencia térmica real (BTU/h / m²) */
+  thermalDensity: number;
+  /** Evaluación acústica / semáforo térmico */
+  densityStatus: 'optimo' | 'subenfriado' | 'sobredimensionado';
+  /** Nomenclatura del condensador sugerido (p. ej. AC036, AC048, AM100, AM300) */
+  condensador?: string;
 }
 
 export interface PricingResult {

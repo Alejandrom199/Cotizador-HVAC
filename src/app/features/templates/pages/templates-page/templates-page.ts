@@ -2,14 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-templates-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './templates-page.html',
 })
 export class TemplatesPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Plantillas HVAC' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly router = inject(Router);
   readonly rows = computed(() => this.workspace.templates());

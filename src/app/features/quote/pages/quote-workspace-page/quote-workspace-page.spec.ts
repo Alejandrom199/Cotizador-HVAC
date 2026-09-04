@@ -134,4 +134,53 @@ describe('QuoteWorkspacePage - Regla de Asignación y Ficha Informativa para Ing
     expect(component.isEngineering()).toBe(false);
     expect(component.isEngineeringUnassigned()).toBe(false);
   });
+
+  it('debe mostrar el Asistente de Tramos de Ductería (R-D-003) para plantillas con red de ductos (PL-02)', async () => {
+    // Tomar solicitud para desbloquear
+    component.take();
+    component.setTab(WorkspaceTab.Calculo);
+    component.goToDucts();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.isDuctTemplate()).toBe(true);
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Dimensionamiento Aerodinámico de Conductos');
+    expect(compiled.textContent).toContain('Formato R-D-003');
+
+    // Tramos cargados en Q-016
+    const segs = component.ductSegments();
+    expect(segs.length).toBeGreaterThan(0);
+    expect(segs[0].name).toBe('Troncal Principal Subsuelos');
+
+    // Resumen consolidado
+    const summary = component.ductSummary();
+    expect(summary).toBeDefined();
+    expect(summary!.totalAreaM2).toBeGreaterThan(0);
+    expect(summary!.piraluSheetsCount).toBeGreaterThan(0);
+  });
+
+  it('debe permitir agregar un tramo y transferir el cálculo a la lista de materiales', async () => {
+    component.take();
+    component.setTab(WorkspaceTab.Calculo);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const initialCount = component.ductSegments().length;
+    component.addDuctSegment();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.ductSegments().length).toBe(initialCount + 1);
+
+    // Transferir ductos a materiales
+    component.transferDuctsToElements();
+    fixture.detectChanges();
+
+    const quote = component.quote();
+    const ductLine = quote?.elements.find((e) => e.code === 'IN-DUCT');
+    expect(ductLine).toBeDefined();
+    expect(ductLine!.qty).toBeGreaterThan(0);
+  });
 });
+

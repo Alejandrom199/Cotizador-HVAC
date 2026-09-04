@@ -2,14 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { QuoteStatus } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-analytics-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './analytics-page.html',
 })
 export class AnalyticsPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Analítica Gerencial' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   readonly vm = computed(() => {
     const quotes = this.workspace.quotes();

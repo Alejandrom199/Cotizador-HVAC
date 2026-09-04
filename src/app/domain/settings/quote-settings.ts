@@ -30,6 +30,10 @@ export interface QuoteSettings {
   maxDiscountPct: number;
   categoryDiscountParams: Record<DiscountCategory, DiscountCategoryParam>;
   roomTypeMultiplier: Record<RoomKind, number>;
+  roomTypeFactorBtu: Record<RoomKind, number>;
+  ventilationCfmPerPerson: number;
+  ventilationCfmPerM2: number;
+  ventilationLpsPerPerson: number;
   defaultTemplateFactorBtu: number;
   cfmPerTon: number;
   btuPerTon: number;
@@ -104,10 +108,22 @@ export const DEFAULT_QUOTE_SETTINGS: QuoteSettings = {
     },
   },
   roomTypeMultiplier: {
+    [RoomKind.Comida]: 1.8569,
     [RoomKind.Critico]: 1.25,
     [RoomKind.Comercial]: 1,
+    [RoomKind.Oficina]: 1.3076,
     [RoomKind.Residencial]: 0.9,
   },
+  roomTypeFactorBtu: {
+    [RoomKind.Comida]: 1207,
+    [RoomKind.Comercial]: 1000,
+    [RoomKind.Oficina]: 850,
+    [RoomKind.Critico]: 1400,
+    [RoomKind.Residencial]: 600,
+  },
+  ventilationCfmPerPerson: 6,
+  ventilationCfmPerM2: 1.9375,
+  ventilationLpsPerPerson: 20,
   defaultTemplateFactorBtu: 650,
   cfmPerTon: 400,
   btuPerTon: 12000,

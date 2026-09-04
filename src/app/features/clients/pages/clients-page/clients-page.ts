@@ -2,14 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Router } from '@angular/router';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-clients-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './clients-page.html',
 })
 export class ClientsPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Clientes' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly router = inject(Router);
   readonly query = signal('');

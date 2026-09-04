@@ -55,6 +55,32 @@ describe('computeRoomThermal', () => {
     expect(result.btu).toBe(18000);
     expect(result.nominal).toBe(18000);
   });
+
+  it('calcula ventilación de aire exterior según ASHRAE 62.1 (# Personas + Área)', () => {
+    // 30 personas, 150.2 m² -> cfmPers = 30*6 = 180, cfmArea = 150.2*1.9375 ≈ 291 -> Total ≈ 471 CFM
+    const result = computeRoomThermal(
+      { area: 150.2, tipo: RoomKind.Comercial, personas: 30 },
+      pl01,
+      settings,
+    );
+    expect(result.cfmVentilation).toBeGreaterThan(450);
+    expect(result.litersPerSec).toBeGreaterThan(200);
+    expect(result.m3PerHour).toBeGreaterThan(700);
+  });
+
+  it('respeta factor de carga térmica personalizado (ej. Local Comida 1207 BTU/m²)', () => {
+    const result = computeRoomThermal(
+      { area: 39.65, tipo: RoomKind.Comida, factorBtuM2: 1207, personas: 3 },
+      pl01,
+      settings,
+    );
+    // 39.65 * 1207 = 47,857 BTU -> nominal = 48,000 BTU
+    expect(result.btu).toBe(47858);
+    expect(result.nominal).toBe(48000);
+    expect(result.ton).toBe(4);
+    expect(result.thermalDensity).toBeCloseTo(1210, -1);
+    expect(result.densityStatus).toBe('optimo');
+  });
 });
 
 describe('computeComplexity', () => {

@@ -6,15 +6,18 @@ import { map } from 'rxjs/operators';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { SessionService } from '@app/core/session.service';
 import { homeListPath, isPendingApproval, isPendingSend } from '@app/core/role-access';
-import { WorkspaceTab, ProductCategory, RoomKind, UserRole, DiscountCategory, QuoteStatus } from '@app/domain/enums';
+import { WorkspaceTab, ProductCategory, RoomKind, UserRole, DiscountCategory, QuoteStatus, QuoteKind } from '@app/domain/enums';
 import { statusClass, stockClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
+import { DuctSegment } from '@app/domain/models/duct-segment.model';
+import { PillBadge } from '@app/shared/ui/pill-badge';
 import { InvestmentSummary } from '@app/shared/ui/investment-summary/investment-summary';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-quote-workspace-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon, InvestmentSummary],
+  imports: [FormsModule, Icon, InvestmentSummary, PillBadge, Breadcrumb],
   templateUrl: './quote-workspace-page.html',
 })
 export class QuoteWorkspacePage {
@@ -34,6 +37,18 @@ export class QuoteWorkspacePage {
   readonly RoomKind = RoomKind;
   readonly WorkspaceTab = WorkspaceTab;
   readonly DiscountCategory = DiscountCategory;
+  readonly QuoteKind = QuoteKind;
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
+    const q = this.quote();
+    const role = this.session.role();
+    const parentPath = homeListPath(role);
+    const parentLabel = this.listLabel();
+    return [
+      { label: parentLabel, url: parentPath },
+      { label: q ? `${q.code} — ${q.name}` : 'Cotización' },
+    ];
+  });
 
   readonly id = toSignal(
     (this.route.parent ?? this.route).paramMap.pipe(map((p) => p.get('id') ?? '')),
@@ -43,21 +58,30 @@ export class QuoteWorkspacePage {
     },
   );
   readonly tab = signal<WorkspaceTab>(WorkspaceTab.Resumen);
+  readonly calcSubTab = signal<'termico' | 'ductos'>('termico');
 
-  /**
-   * Flag de control para mostrar/ocultar la pestaña de Elementos en cotizaciones.
-   * (Poner en true para volver a activarla).
-   */
-  readonly showElementsTab = signal(false);
+  readonly availableTabs = computed(() => {
+    const q = this.quote();
+    const isMaintenance = q?.tipo === QuoteKind.Mantenimiento;
 
-  readonly availableTabs = computed(() => [
-    { id: WorkspaceTab.Resumen, l: 'Resumen' },
-    { id: WorkspaceTab.Calculo, l: 'Cálculo HVAC' },
-    ...(this.showElementsTab() ? [{ id: WorkspaceTab.Elementos, l: 'Elementos' }] : []),
-    { id: WorkspaceTab.Tiempos, l: 'Tiempos / SLA' },
-    { id: WorkspaceTab.Reajuste, l: 'Reajuste' },
-    { id: WorkspaceTab.Informe, l: 'Informe final' },
-  ]);
+    const tabs: { id: WorkspaceTab; l: string }[] = [
+      { id: WorkspaceTab.Resumen, l: 'Resumen' },
+    ];
+
+    if (!isMaintenance) {
+      tabs.push({ id: WorkspaceTab.Calculo, l: 'Cálculo HVAC' });
+    }
+
+    tabs.push({ id: WorkspaceTab.Elementos, l: 'Presupuesto' });
+
+    tabs.push(
+      { id: WorkspaceTab.Reajuste, l: isMaintenance ? 'Costos / Reajuste' : 'Reajuste' },
+      { id: WorkspaceTab.Tiempos, l: 'Tiempos / SLA' },
+      { id: WorkspaceTab.Informe, l: 'Informe final' },
+    );
+
+    return tabs;
+  });
 
   readonly openCats = signal<Record<string, boolean>>({
     [ProductCategory.Equipos]: true,
@@ -118,7 +142,7 @@ export class QuoteWorkspacePage {
   readonly calcTotals = computed(() => {
     const q = this.quote();
     if (!q) {
-      return { area: 0, ton: 0, btu: 0, cfm: 0 };
+      return { area: 0, ton: 0, btu: 0, cfm: 0, cfmVent: 0, lps: 0, m3h: 0, pers: 0 };
     }
     return q.rooms.reduce(
       (acc, room) => {
@@ -127,11 +151,25 @@ export class QuoteWorkspacePage {
         acc.ton += th.ton;
         acc.btu += th.nominal;
         acc.cfm += th.cfm;
+        acc.cfmVent += th.cfmVentilation || 0;
+        acc.lps += th.litersPerSec || 0;
+        acc.m3h += th.m3PerHour || 0;
+        acc.pers += room.personas || 0;
         return acc;
       },
-      { area: 0, ton: 0, btu: 0, cfm: 0 },
+      { area: 0, ton: 0, btu: 0, cfm: 0, cfmVent: 0, lps: 0, m3h: 0, pers: 0 },
     );
   });
+
+  densityBadge(status: 'optimo' | 'subenfriado' | 'sobredimensionado'): { label: string; tone: 'success' | 'warn' | 'danger' } {
+    if (status === 'subenfriado') {
+      return { label: 'Subenfriado', tone: 'warn' };
+    }
+    if (status === 'sobredimensionado') {
+      return { label: 'Sobredimensionado', tone: 'danger' };
+    }
+    return { label: 'Óptimo', tone: 'success' };
+  }
   readonly iva = computed(() => this.workspace.settings.ivaRate);
   readonly maxDisc = computed(() => this.workspace.settings.maxDiscountPct);
   readonly discountParams = this.workspace.discountParams;
@@ -238,12 +276,29 @@ export class QuoteWorkspacePage {
 
   applyTpl(): void {
     this.workspace.applyTemplate(this.id());
-    this.tab.set(this.showElementsTab() ? 'elementos' : 'resumen');
+    this.setTab(WorkspaceTab.Elementos);
+  }
+
+  readonly stageInputHours = signal<number | null>(null);
+
+  getActiveHours(meta: number): number {
+    return this.stageInputHours() ?? meta;
+  }
+
+  setStageInputHours(val: number): void {
+    this.stageInputHours.set(isNaN(val) ? 0 : val);
+  }
+
+  confirmCloseStage(meta: number): void {
+    const hours = this.stageInputHours() ?? meta;
+    if (hours >= 0) {
+      this.workspace.closeStage(this.id(), hours);
+      this.stageInputHours.set(null);
+    }
   }
 
   closeCurrentStage(meta: number): void {
-    const hours = +(meta * (0.8 + Math.random() * 0.6)).toFixed(1);
-    this.workspace.closeStage(this.id(), hours);
+    this.confirmCloseStage(meta);
   }
 
   toggleCat(cat: string): void {
@@ -305,5 +360,76 @@ export class QuoteWorkspacePage {
       return 'en meta';
     }
     return (desvio > 0 ? '+' : '') + this.hours(Math.abs(desvio));
+  }
+
+  // --- Asistente de Tramos de Ductería (R-D-003) ---
+
+  readonly isDuctTemplate = computed(() => {
+    const t = this.template();
+    if (!t) return false;
+    return (
+      t.code === 'PL-02' ||
+      t.code === 'PL-03' ||
+      t.name.toLowerCase().includes('duct') ||
+      t.name.toLowerCase().includes('uma')
+    );
+  });
+
+  readonly ductSegments = computed(() => {
+    const q = this.quote();
+    return q ? this.workspace.ductSegments(q) : [];
+  });
+
+  readonly ductSummary = computed(() => {
+    const q = this.quote();
+    return q ? this.workspace.ductSummary(q) : null;
+  });
+
+  ductMetrics(segment: DuctSegment) {
+    return this.workspace.ductMetrics(segment);
+  }
+
+  addDuctSegment(): void {
+    this.workspace.addDuctSegment(this.id());
+  }
+
+  patchDuctSegment(segmentId: string, patch: Partial<DuctSegment>): void {
+    this.workspace.patchDuctSegment(this.id(), segmentId, patch);
+  }
+
+  removeDuctSegment(segmentId: string): void {
+    this.workspace.removeDuctSegment(this.id(), segmentId);
+  }
+
+  transferDuctsToElements(): void {
+    this.workspace.transferDuctsToElements(this.id());
+  }
+
+  syncRoomsToDucts(): void {
+    this.workspace.syncRoomsToDucts(this.id());
+  }
+
+  goToDucts(): void {
+    if (this.ductSegments().length === 0) {
+      this.syncRoomsToDucts();
+    }
+    this.calcSubTab.set('ductos');
+  }
+
+  transferDuctsAndContinue(): void {
+    this.transferDuctsToElements();
+    this.setTab(WorkspaceTab.Elementos);
+  }
+
+  goToNextAfterThermal(): void {
+    if (this.isDuctTemplate()) {
+      this.goToDucts();
+    } else {
+      this.applyTpl();
+    }
+  }
+
+  goToThermal(): void {
+    this.calcSubTab.set('termico');
   }
 }

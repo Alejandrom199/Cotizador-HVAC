@@ -2,6 +2,7 @@ import { computed, inject, Injectable } from '@angular/core';
 import { Quote } from '../domain/models/quote.model';
 import { QuoteLine } from '../domain/models/quote-line.model';
 import { Room } from '../domain/models/room.model';
+import { DuctSegment, DuctSegmentMetrics, DuctSystemSummary } from '../domain/models/duct-segment.model';
 import { Client } from '../domain/models/client.model';
 import { Product } from '../domain/models/product.model';
 import { SystemTemplate } from '../domain/models/template.model';
@@ -19,6 +20,10 @@ import { computeComplexity } from '../domain/calculators/complexity.calculator';
 import { computeRoomThermal } from '../domain/calculators/thermal.calculator';
 import { computeStageTimes } from '../domain/calculators/stage-time.calculator';
 import { applyTemplateLines } from '../domain/calculators/apply-template';
+import {
+  computeDuctSegmentMetrics,
+  computeDuctSystemSummary,
+} from '../domain/calculators/duct.calculator';
 import {
   cycleHours,
   effectiveArea,
@@ -40,6 +45,7 @@ import {
   UserRole,
   DiscountCategory,
   ClientType,
+  ProductCode,
 } from '../domain/enums';
 import { SessionService } from '../core/session.service';
 import { ToastService } from '../core/toast.service';
@@ -270,12 +276,17 @@ export class QuoteWorkspaceService {
       return;
     }
     hrs[index] = hours;
-    const names = [QuoteStatus.Elaboracion, QuoteStatus.Planos, QuoteStatus.Calculos, QuoteStatus.Cotizacion];
+    const nextStates = [
+      QuoteStatus.Planos,
+      QuoteStatus.Calculos,
+      QuoteStatus.Cotizacion,
+      QuoteStatus.Validacion,
+    ];
     this.quotesRepo.upsert({
       ...quote,
       hrs,
       etapa: Math.min(4, index + 2),
-      estado: index >= 3 ? QuoteStatus.Validacion : names[index] ?? quote.estado,
+      estado: nextStates[index] ?? quote.estado,
     });
     this.toast.show('Etapa cerrada - ' + hours + ' h registradas');
   }
@@ -801,5 +812,120 @@ export class QuoteWorkspaceService {
     return tipo === QuoteKind.Mantenimiento
       ? 'Cotización de Mantenimiento ' + n
       : 'Cotización de Climatización ' + n;
+  }
+
+  // --- Asistente de Tramos de Ductería (Formato R-D-003) ---
+
+  ductSegments(quote: Quote): DuctSegment[] {
+    return quote.ductSegments || [];
+  }
+
+  ductMetrics(segment: DuctSegment, isPiralu = true): DuctSegmentMetrics {
+    return computeDuctSegmentMetrics(segment, isPiralu);
+  }
+
+  ductSummary(quote: Quote, isPiralu = true): DuctSystemSummary {
+    return computeDuctSystemSummary(quote.ductSegments || [], 0.15, isPiralu);
+  }
+
+  addDuctSegment(id: string): void {
+    const quote = this.quotesRepo.getById(id);
+    if (!quote) return;
+    const count = (quote.ductSegments || []).length + 1;
+    const newSeg: DuctSegment = {
+      id: 'd' + Math.random().toString(36).slice(2, 6),
+      name: 'Tramo ' + count,
+      aInches: 24,
+      bInches: 12,
+      lengthM: 6,
+      flowCfm: 800,
+    };
+    this.quotesRepo.upsert({
+      ...quote,
+      ductSegments: [...(quote.ductSegments || []), newSeg],
+    });
+  }
+
+  patchDuctSegment(id: string, segmentId: string, patch: Partial<DuctSegment>): void {
+    const quote = this.quotesRepo.getById(id);
+    if (!quote || !quote.ductSegments) return;
+    this.quotesRepo.upsert({
+      ...quote,
+      ductSegments: quote.ductSegments.map((s) => (s.id === segmentId ? { ...s, ...patch } : s)),
+    });
+  }
+
+  removeDuctSegment(id: string, segmentId: string): void {
+    const quote = this.quotesRepo.getById(id);
+    if (!quote || !quote.ductSegments) return;
+    this.quotesRepo.upsert({
+      ...quote,
+      ductSegments: quote.ductSegments.filter((s) => s.id !== segmentId),
+    });
+  }
+
+  transferDuctsToElements(id: string): void {
+    const quote = this.quotesRepo.getById(id);
+    if (!quote) return;
+    const summary = this.ductSummary(quote);
+    if (summary.totalAreaM2 <= 0) {
+      this.toast.show('Ingresa al menos un tramo de ducto con dimensiones válidas');
+      return;
+    }
+
+    this.setCatalogQty(id, ProductCode.InDuct, summary.totalAreaM2);
+    this.setCatalogQty(id, ProductCode.InCinta, Math.max(1, Math.ceil(summary.totalAreaM2 / 30)));
+    this.setCatalogQty(id, ProductCode.InSop, Math.max(2, Math.ceil(summary.totalLengthM / 2)));
+    this.setCatalogQty(id, ProductCode.MoDuct, Math.max(4, Math.round(summary.totalAreaM2 * 0.75)));
+
+    this.toast.show(
+      `Ductería transferida: ${summary.totalAreaM2} m² (${summary.piraluSheetsCount} planchas PIRALU) a la lista de materiales`,
+    );
+  }
+
+  syncRoomsToDucts(id: string): void {
+    const quote = this.quotesRepo.getById(id);
+    if (!quote || !quote.rooms.length) {
+      this.toast.show('No hay ambientes configurados para sincronizar');
+      return;
+    }
+
+    const segments: DuctSegment[] = quote.rooms.map((r, idx) => {
+      const th = this.thermal(r, quote);
+      const cfm = th.cfm || 400;
+      let a = 20;
+      let b = 10;
+      if (cfm >= 2000) {
+        a = 32;
+        b = 16;
+      } else if (cfm >= 1400) {
+        a = 28;
+        b = 14;
+      } else if (cfm >= 1000) {
+        a = 24;
+        b = 12;
+      } else if (cfm >= 600) {
+        a = 18;
+        b = 10;
+      } else {
+        a = 14;
+        b = 10;
+      }
+
+      return {
+        id: 'd' + Math.random().toString(36).slice(2, 6),
+        name: `Ramal ${r.name || 'Ambiente ' + (idx + 1)}`,
+        aInches: a,
+        bInches: b,
+        lengthM: Number(Math.max(3, Math.sqrt(r.area)).toFixed(1)),
+        flowCfm: cfm,
+      };
+    });
+
+    this.quotesRepo.upsert({
+      ...quote,
+      ductSegments: segments,
+    });
+    this.toast.show(`Se generaron ${segments.length} tramos de ductos basados en los ambientes calculados`);
   }
 }

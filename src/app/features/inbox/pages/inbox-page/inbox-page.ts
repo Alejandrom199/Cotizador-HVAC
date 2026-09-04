@@ -5,14 +5,16 @@ import { SessionService } from '@app/core/session.service';
 import { WorkspaceTab } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
 import { statusClass } from '@app/shared/ui/presentation';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-inbox-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './inbox-page.html',
 })
 export class InboxPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Bandeja Técnica de Ingeniería' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);

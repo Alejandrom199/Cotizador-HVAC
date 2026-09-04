@@ -1,5 +1,5 @@
 <div class="page">
-  <p class="crumb"><button type="button" (click)="cancel()">Plantillas</button> / {{ isNew ? 'Nuevo' : code() }}</p>
+  <app-breadcrumb [items]="breadcrumbs()" />
   <div class="page-head">
     <div>
       <h1>{{ isNew ? 'Nueva plantilla' : 'Editar plantilla' }}</h1>

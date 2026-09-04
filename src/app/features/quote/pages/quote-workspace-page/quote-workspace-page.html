@@ -1,6 +1,6 @@
 @if (quote(); as q) {
   <div class="page">
-    <p class="crumb"><button type="button" (click)="back()">← {{ listLabel() }}</button></p>
+    <app-breadcrumb [items]="breadcrumbs()" />
     <div class="page-head" style="align-items:center">
       <div style="min-width:0;flex:1">
         <h1>{{ q.name }} <span [class]="statusClass(q.estado)" style="margin-left:8px;vertical-align:middle">{{ q.estado }}</span></h1>
@@ -30,22 +30,17 @@
 
     @if (tab() === 'resumen' && pricing(); as p) {
       @if (isEngineeringUnassigned()) {
-        <div class="message-strip warn" style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-          <div style="flex:1;min-width:280px">
-            <div class="k"><app-icon name="take" /> Solicitud técnica en bandeja sin asignar</div>
-            <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.</p>
-          </div>
-          <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
-            <app-icon name="take" /> Tomar solicitud para editar
-          </button>
-        </div>
-
         <div class="summary-grid">
           <div class="card card-lg" style="grid-column: span 2">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1px solid var(--em-line);padding-bottom:12px">
               <div class="section-title" style="margin:0">Ficha Informativa del Proyecto / Solicitud</div>
               <span class="stock warn" style="font-weight:700">Sin Asignar</span>
             </div>
+
+            <div class="hint" style="margin-bottom:18px;background:#fffbeb;border-left-color:#f59e0b;color:#78350f">
+              Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.
+            </div>
+
             <div class="kv-list">
               <div>
                 <div class="k">Proyecto</div>
@@ -120,15 +115,9 @@
           </div>
 
           <div style="display:flex;flex-direction:column;gap:20px">
-            <div class="card card-lg" style="background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);border-color:#bae6fd">
-              <div class="section-title" style="color:#0369a1">Acción requerida</div>
-              <p class="muted" style="margin:0 0 16px;font-size:13px;line-height:1.45">
-                Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.
-              </p>
-              <button class="btn btn-primary" type="button" (click)="take()" style="width:100%;height:46px;justify-content:center;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(2,132,199,0.35);margin-bottom:12px">
-                <app-icon name="take" /> Tomar solicitud para editar
-              </button>
-              <div class="kv-list" style="margin-top:8px;grid-template-columns:1fr;gap:8px">
+            <div class="card card-lg">
+              <div class="section-title">Compromiso & Tiempos (SLA)</div>
+              <div class="kv-list" style="margin-top:8px;grid-template-columns:1fr;gap:10px">
                 <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--em-line);padding-bottom:6px">
                   <span class="k" style="margin:0">SLA Estimado</span>
                   <span class="v num" style="margin:0">{{ slaView()?.slaLabel }}</span>
@@ -228,90 +217,293 @@
               </div>
             </div>
           </div>
+          <div class="card card-lg" style="grid-column: 1 / -1; display:flex; justify-content:space-between; align-items:center; padding: 16px 20px; background: rgba(14,107,123,0.03); border: 1px solid rgba(14,107,123,0.15); flex-wrap:wrap; gap:12px">
+            <div>
+              <div style="font-weight:700; color:var(--em-ink); font-size:14px">Siguiente paso del proceso técnico</div>
+              <div class="muted" style="font-size:12.5px; margin-top:2px">
+                @if (q.tipo === QuoteKind.Mantenimiento) {
+                  Revisa los costos, insumos y horas de mano de obra del servicio de mantenimiento.
+                } @else {
+                  Calcula las cargas térmicas de los ambientes y el dimensionamiento de conductos.
+                }
+              </div>
+            </div>
+            <button class="btn btn-primary" type="button" (click)="setTab(q.tipo === QuoteKind.Mantenimiento ? WorkspaceTab.Reajuste : WorkspaceTab.Calculo)" style="font-weight:700">
+              @if (q.tipo === QuoteKind.Mantenimiento) {
+                Ir a Costos / Presupuesto ➔
+              } @else {
+                Iniciar Cargas Térmicas ➔
+              }
+            </button>
+          </div>
           <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
         </div>
       }
     }
 
     @if (tab() === 'calculo' && pricing(); as p) {
-      <div class="calc-layout">
-        <div>
-          @if (isEngineeringUnassigned()) {
-            <div class="message-strip warn" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-              <div style="flex:1;min-width:280px">
-                <div class="k"><app-icon name="take" /> Modo Informativo — Solicitud sin asignar</div>
-                <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud.</p>
-              </div>
-              <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
-                <app-icon name="take" /> Tomar solicitud para editar
-              </button>
-            </div>
-          } @else {
-            <div class="message-strip">
-              <div class="k"><app-icon name="info" /> Motor de cálculo HVAC</div>
-              <p>Sustituye las hojas Excel de capacidad y ductos. Sugiere equipos según área, uso y plantilla (BTU y CFM).</p>
-            </div>
-          }
-          <div class="calc-toolbar">
-            <div class="calc-tpl">
-              <label class="field">Plantilla paramétrica</label>
-              <select class="select" [ngModel]="q.plantilla" [disabled]="isEngineeringUnassigned()" (ngModelChange)="setPlantilla($event)">
-                @for (t of templates(); track t.code) {
-                  <option [value]="t.code">{{ t.name }} — {{ t.sub }}</option>
-                }
-              </select>
-            </div>
-            <button class="btn" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.addRoom(q.id)"><app-icon name="add" /> Ambiente</button>
-          </div>
-          <div class="table">
-            <div class="thead cols-calc">
-              <span>Ambiente</span><span>Área m²</span><span>Uso</span><span>BTU</span><span>CFM</span><span>Equipo sugerido</span><span></span>
-            </div>
-            @for (r of q.rooms; track r.id) {
-              @let th = workspace.thermal(r, q);
-              <div class="trow static cols-calc">
-                <input class="input" [disabled]="isEngineeringUnassigned()" [ngModel]="r.name" (ngModelChange)="workspace.patchRoom(q.id, r.id, {name:$event})" />
-                <input class="input num" type="number" [disabled]="isEngineeringUnassigned()" [ngModel]="r.area" (ngModelChange)="workspace.patchRoom(q.id, r.id, {area:+$event})" />
-                <select class="select" [disabled]="isEngineeringUnassigned()" [ngModel]="r.tipo" (ngModelChange)="workspace.patchRoom(q.id, r.id, {tipo:$event})">
-                  <option [value]="RoomKind.Comercial">Comercial</option>
-                  <option [value]="RoomKind.Critico">Crítico</option>
-                  <option [value]="RoomKind.Residencial">Residencial</option>
-                </select>
-                <span class="num">{{ th.nominal.toLocaleString('en-US') }}</span>
-                <span class="num">{{ th.cfm.toLocaleString('en-US') }}</span>
-                <span>{{ equipoName(th.equipo) }}</span>
-                <button class="btn btn-ghost" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.removeRoom(q.id, r.id)"><app-icon name="trash" size="sm" /></button>
-              </div>
+      <!-- Sub-pestañas internas de Cálculo HVAC -->
+      <div class="tabs sub-tabs" style="margin-bottom:20px;border-bottom:1px solid var(--em-line);display:flex;gap:8px">
+        <button class="tab" [class.on]="calcSubTab() === 'termico'" type="button" (click)="calcSubTab.set('termico')" style="font-weight:600">
+          <app-icon name="calc" /> 1. Cargas Térmicas y Ventilación
+        </button>
+        @if (isDuctTemplate()) {
+          <button class="tab" [class.on]="calcSubTab() === 'ductos'" type="button" (click)="calcSubTab.set('ductos')" style="font-weight:600">
+            <app-icon name="ducts" /> 2. Red de Ductos (Formato R-D-003)
+            @if (ductSegments().length > 0) {
+              <span class="stock ok" style="margin-left:8px;font-size:11px;padding:2px 6px;border-radius:10px">{{ ductSegments().length }} tramos</span>
             }
-            @if (!q.rooms.length) {
-              <div class="trow static cols-calc" style="grid-column: 1 / -1; justify-content: center; padding: 20px;">
-                <span class="muted">Sin ambientes definidos. @if (isEngineeringUnassigned()) { Toma la solicitud para agregar ambientes y calcular cargas. } @else { Haz clic en "+ Ambiente" para dimensionar. }</span>
-              </div>
-            }
-            <div class="trow static cols-calc calc-total">
-              <strong>TOTAL</strong>
-              <span class="num">{{ calcTotals().area.toFixed(1) }} m²</span>
-              <span></span>
-              <span class="num">{{ calcTotals().btu.toLocaleString('en-US') }}</span>
-              <span class="num">{{ calcTotals().cfm.toLocaleString('en-US') }}</span>
-              <span class="num">{{ calcTotals().ton.toFixed(1) }} TR</span>
-              <span></span>
-            </div>
-          </div>
-          <div class="actions-row" style="justify-content:flex-start">
-            <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="applyTpl()"><app-icon name="templates" /> Aplicar plantilla y generar materiales</button>
+          </button>
+        }
+      </div>
+
+      <!-- Sub-Opción 1: Cargas Térmicas y Ventilación -->
+      @if (calcSubTab() === 'termico') {
+        <div class="calc-layout">
+          <div>
             @if (isEngineeringUnassigned()) {
-              <button class="btn btn-green" type="button" (click)="take()"><app-icon name="take" /> Tomar solicitud</button>
+              <div class="message-strip warn" style="margin-bottom:16px">
+                <div class="k"><app-icon name="info" /> Modo Informativo — Solicitud sin asignar</div>
+                <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para iniciar el dimensionamiento térmico y cálculo HVAC, debes tomar la solicitud desde el botón superior.</p>
+              </div>
+            } @else {
+              <div class="message-strip">
+                <div class="k"><app-icon name="info" /> 1. Cálculo de Cargas Térmicas y Ventilación</div>
+                <p>Dimensionamiento de capacidad por recinto, factores de uso EMASESOR y renovación de aire exterior según norma ASHRAE 62.1.</p>
+              </div>
+            }
+            <div class="calc-toolbar">
+              <div class="calc-tpl">
+                <label class="field">Plantilla paramétrica</label>
+                <select class="select" [ngModel]="q.plantilla" [disabled]="isEngineeringUnassigned()" (ngModelChange)="setPlantilla($event)">
+                  @for (t of templates(); track t.code) {
+                    <option [value]="t.code">{{ t.name }} — {{ t.sub }}</option>
+                  }
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                @if (isDuctTemplate()) {
+                  <button class="btn" type="button" [disabled]="isEngineeringUnassigned()" (click)="goToDucts()" title="Ir al dimensionamiento de ductos con los CFM calculados">
+                    <app-icon name="calc" /> Pasar a Red de Ductos ➔
+                  </button>
+                }
+                <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.addRoom(q.id)"><app-icon name="add" /> Ambiente</button>
+              </div>
+            </div>
+            <div class="calc-table-wrap">
+              <div class="table">
+                <div class="thead cols-calc">
+                  <span>Ambiente / Local</span>
+                  <span style="text-align:center">Área m²</span>
+                  <span>Uso / Factor</span>
+                  <span style="text-align:center"># Pers</span>
+                  <span style="text-align:center">Aire Ext. (CFM)</span>
+                  <span style="text-align:center">BTU/h</span>
+                  <span style="text-align:center">CFM Sum.</span>
+                  <span style="text-align:center">Densidad BTU/m²</span>
+                  <span>Equipo sugerido</span>
+                  <span></span>
+                </div>
+                @for (r of q.rooms; track r.id) {
+                  @let th = workspace.thermal(r, q);
+                  @let dBadge = densityBadge(th.densityStatus);
+                  <div class="trow static cols-calc" style="align-items:center">
+                    <input class="input" [disabled]="isEngineeringUnassigned()" [ngModel]="r.name" (ngModelChange)="workspace.patchRoom(q.id, r.id, {name:$event})" placeholder="Nombre ambiente" />
+                    <input class="input num" type="number" [disabled]="isEngineeringUnassigned()" [ngModel]="r.area" (ngModelChange)="workspace.patchRoom(q.id, r.id, {area:+$event})" />
+                    <select class="select" [disabled]="isEngineeringUnassigned()" [ngModel]="r.tipo" (ngModelChange)="workspace.patchRoom(q.id, r.id, {tipo:$event})">
+                      <option [value]="RoomKind.Comida">Comida (1,207)</option>
+                      <option [value]="RoomKind.Comercial">Comercial (1,000)</option>
+                      <option [value]="RoomKind.Oficina">Oficina (850)</option>
+                      <option [value]="RoomKind.Residencial">Residencial (600)</option>
+                      <option [value]="RoomKind.Critico">Crítico (1,400)</option>
+                    </select>
+                    <input class="input num" type="number" min="0" placeholder="0" [disabled]="isEngineeringUnassigned()" [ngModel]="r.personas" (ngModelChange)="workspace.patchRoom(q.id, r.id, {personas:+$event})" />
+                    <div style="text-align:center">
+                      <span class="num" style="font-weight:700">{{ th.cfmVentilation }}</span>
+                      <div class="muted num" style="font-size:11px">{{ th.litersPerSec }} L/s</div>
+                    </div>
+                    <span class="num" style="text-align:center;font-weight:600">{{ th.nominal.toLocaleString('en-US') }}</span>
+                    <span class="num" style="text-align:center;font-weight:600">{{ th.cfm.toLocaleString('en-US') }}</span>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                      <span class="num" style="font-weight:700;font-size:13px">{{ th.thermalDensity }}</span>
+                      <app-pill-badge [label]="dBadge.label" [tone]="dBadge.tone" />
+                    </div>
+                    <div style="font-size:12.5px;line-height:1.3">
+                      <strong style="color:var(--em-ink)">{{ equipoName(th.equipo) }}</strong>
+                      <div class="muted" style="font-size:11px">Cond: {{ th.condensador }}</div>
+                    </div>
+                    <button class="btn btn-ghost" type="button" [disabled]="isEngineeringUnassigned()" (click)="workspace.removeRoom(q.id, r.id)"><app-icon name="trash" size="sm" /></button>
+                  </div>
+                }
+                @if (!q.rooms.length) {
+                  <div class="trow static cols-calc" style="grid-column: 1 / -1; justify-content: center; padding: 20px;">
+                    <span class="muted">Sin ambientes definidos. @if (isEngineeringUnassigned()) { Toma la solicitud para agregar ambientes y calcular cargas. } @else { Haz clic en "+ Ambiente" para dimensionar. }</span>
+                  </div>
+                }
+                <div class="trow static cols-calc calc-total">
+                  <strong>TOTAL</strong>
+                  <span class="num" style="text-align:center">{{ calcTotals().area.toFixed(1) }} m²</span>
+                  <span></span>
+                  <span class="num" style="text-align:center">{{ calcTotals().pers }} pers</span>
+                  <span class="num" style="text-align:center">{{ calcTotals().cfmVent }} CFM</span>
+                  <span class="num" style="text-align:center">{{ calcTotals().btu.toLocaleString('en-US') }} ({{ calcTotals().ton.toFixed(1) }} TR)</span>
+                  <span class="num" style="text-align:center">{{ calcTotals().cfm.toLocaleString('en-US') }}</span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+            <div class="actions-row" style="justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--em-line)">
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-secondary" type="button" [disabled]="isEngineeringUnassigned()" (click)="applyTpl()">
+                  <app-icon name="templates" /> Aplicar plantilla a materiales
+                </button>
+              </div>
+              <div style="display:flex;gap:10px">
+                @if (isDuctTemplate()) {
+                  <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="goToDucts()" style="font-weight:700">
+                    Continuar a Red de Ductos ➔
+                  </button>
+                } @else {
+                  <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="goToNextAfterThermal()" style="font-weight:700">
+                    Continuar a Presupuesto ➔
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+          <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
+        </div>
+      }
+
+      <!-- Sub-Opción 2: Red de Ductería (Formato R-D-003) -->
+      @if (calcSubTab() === 'ductos' && isDuctTemplate()) {
+        <div style="width:100%;max-width:100%;box-sizing:border-box">
+          <div class="card card-lg" style="width:100%;box-sizing:border-box;overflow:hidden;border:1px solid rgba(14,107,123,0.2);background:rgba(14,107,123,0.02)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--em-line);padding-bottom:16px">
+              <div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="section-title" style="margin:0;font-size:17px">2. Dimensionamiento Aerodinámico de Conductos</div>
+                  <app-pill-badge label="Formato R-D-003" tone="info" />
+                </div>
+                <p class="muted" style="margin:4px 0 0 0;font-size:13px">
+                  Cálculo aerodinámico tramo por tramo (Huebscher/ASHRAE Fundamentals). Control acústico de velocidad (< 1,500 FPM) y cubicación de lámina SMACNA / PIRALU.
+                </p>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn" type="button" [disabled]="isEngineeringUnassigned()" (click)="syncRoomsToDucts()" title="Carga automáticamente los CFM calculados en la pestaña de ambientes">
+                  <app-icon name="calc" /> Sincronizar CFM desde Ambientes
+                </button>
+                <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned()" (click)="addDuctSegment()">
+                  <app-icon name="add" /> + Tramo de ducto
+                </button>
+              </div>
+            </div>
+
+            <div class="duct-table-wrap">
+              <div class="table">
+                <div class="thead cols-ducts">
+                  <span>Tramo / Ramal</span>
+                  <span style="text-align:center">a (pulg)</span>
+                  <span style="text-align:center">b (pulg)</span>
+                  <span style="text-align:center">a (m)</span>
+                  <span style="text-align:center">b (m)</span>
+                  <span style="text-align:center">Largo (m)</span>
+                  <span style="text-align:center">Caudal (CFM)</span>
+                  <span style="text-align:center">Deq (pulg)</span>
+                  <span style="text-align:center">Velocidad (FPM)</span>
+                  <span style="text-align:center">P. Din (in H₂O)</span>
+                  <span style="text-align:center">P. Din (Pa)</span>
+                  <span style="text-align:center">Área (m²)</span>
+                  <span style="text-align:center">Calibre</span>
+                  <span style="text-align:center">Peso (Kg)</span>
+                  <span></span>
+                </div>
+
+                @for (seg of ductSegments(); track seg.id) {
+                  @let m = ductMetrics(seg);
+                  <div class="trow static cols-ducts" style="align-items:center">
+                    <input class="input duct-input-name" [disabled]="isEngineeringUnassigned()" [ngModel]="seg.name" (ngModelChange)="patchDuctSegment(seg.id, { name: $event })" />
+                    <input class="input num duct-input-num" type="number" min="4" max="120" [disabled]="isEngineeringUnassigned()" [ngModel]="seg.aInches" (ngModelChange)="patchDuctSegment(seg.id, { aInches: +$event })" />
+                    <input class="input num duct-input-num" type="number" min="4" max="120" [disabled]="isEngineeringUnassigned()" [ngModel]="seg.bInches" (ngModelChange)="patchDuctSegment(seg.id, { bInches: +$event })" />
+                    <span class="num" style="text-align:center;font-size:12px;color:var(--em-muted)">{{ m.aMeters }}</span>
+                    <span class="num" style="text-align:center;font-size:12px;color:var(--em-muted)">{{ m.bMeters }}</span>
+                    <input class="input num duct-input-num" type="number" min="0.1" step="0.5" [disabled]="isEngineeringUnassigned()" [ngModel]="seg.lengthM" (ngModelChange)="patchDuctSegment(seg.id, { lengthM: +$event })" />
+                    <input class="input num duct-input-num" type="number" min="50" step="50" [disabled]="isEngineeringUnassigned()" [ngModel]="seg.flowCfm" (ngModelChange)="patchDuctSegment(seg.id, { flowCfm: +$event })" />
+                    <span class="num" style="text-align:center;font-weight:600;font-size:13.5px">{{ m.deqInches.toFixed(1) }}″</span>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                      <span class="num" style="font-weight:700;font-size:13px">{{ m.velocityFpm.toLocaleString('en-US') }} FPM</span>
+                      <app-pill-badge [label]="m.statusTone === 'ok' ? 'Óptimo' : m.statusTone === 'warn' ? 'Moderado' : 'Ruidoso'" [tone]="m.statusTone" />
+                    </div>
+                    <span class="num" style="text-align:center;font-size:12px">{{ m.dynamicInH2O.toFixed(3) }}</span>
+                    <span class="num" style="text-align:center;font-weight:600;font-size:13px">{{ m.dynamicPa.toFixed(1) }}</span>
+                    <span class="num" style="text-align:center;font-weight:600;font-size:13.5px">{{ m.areaM2.toFixed(1) }} m²</span>
+                    <div style="text-align:center">
+                      <span class="num" style="font-weight:700;font-size:12.5px;color:var(--em-accent)">{{ m.gauge }}</span>
+                      <div class="muted num" style="font-size:10.5px">{{ m.weightPerM2 }} kg/m²</div>
+                    </div>
+                    <span class="num" style="text-align:center;font-weight:700;font-size:13.5px">{{ m.weightKg.toFixed(1) }}</span>
+                    <button class="btn btn-ghost" type="button" [disabled]="isEngineeringUnassigned()" (click)="removeDuctSegment(seg.id)">
+                      <app-icon name="trash" size="sm" />
+                    </button>
+                  </div>
+                }
+
+                @if (!ductSegments().length) {
+                  <div class="trow static cols-ducts" style="grid-column: 1 / -1; justify-content: center; padding: 24px;">
+                    <span class="muted">Sin tramos de ducto ingresados. Haz clic en "+ Tramo de ducto" o "Sincronizar CFM desde Ambientes" para dimensionar por tramos.</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (ductSummary(); as ds) {
+              <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+                <div class="card" style="box-shadow:none;padding:14px;background:var(--card-bg)">
+                  <div class="muted" style="font-size:12px;font-weight:600">LONGITUD TOTAL</div>
+                  <div class="num" style="font-size:22px;font-weight:700;margin-top:2px">{{ ds.totalLengthM }} m</div>
+                  <div class="muted" style="font-size:11.5px">Metros lineales de red</div>
+                </div>
+                <div class="card" style="box-shadow:none;padding:14px;background:var(--card-bg)">
+                  <div class="muted" style="font-size:12px;font-weight:600">DESARROLLO DE LÁMINA</div>
+                  <div class="num" style="font-size:22px;font-weight:700;margin-top:2px">{{ ds.totalAreaM2 }} m²</div>
+                  <div class="muted" style="font-size:11.5px">Área superficial total</div>
+                </div>
+                <div class="card" style="box-shadow:none;padding:14px;background:var(--card-bg)">
+                  <div class="muted" style="font-size:12px;font-weight:600">PESO CON DESPERDICIO (+15%)</div>
+                  <div class="num" style="font-size:22px;font-weight:700;margin-top:2px">{{ ds.totalWeightWithWasteKg }} Kg</div>
+                  <div class="muted" style="font-size:11.5px">Neto: {{ ds.totalWeightKg }} Kg</div>
+                </div>
+                <div class="card" style="box-shadow:none;padding:14px;background:rgba(31,157,100,0.08);border:1.5px solid rgba(31,157,100,0.3)">
+                  <div class="muted" style="font-size:12px;font-weight:700;color:var(--color-green)">PLANCHAS PIRALU (1.2×3.0m)</div>
+                  <div class="num" style="font-size:24px;font-weight:800;color:var(--color-green);margin-top:2px">{{ ds.piraluSheetsCount }} Planchas</div>
+                  <div class="muted" style="font-size:11.5px">Cálculo exacto para compra</div>
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--em-line)">
+                <button class="btn btn-secondary" type="button" (click)="goToThermal()">
+                  ← Volver a Cargas Térmicas
+                </button>
+                <button class="btn btn-primary" type="button" [disabled]="isEngineeringUnassigned() || !ductSegments().length" (click)="transferDuctsAndContinue()" style="font-weight:700">
+                  <app-icon name="check" /> Transferir a Presupuesto y Continuar ➔
+                </button>
+              </div>
             }
           </div>
         </div>
-        <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
-      </div>
+      }
     }
 
-    @if (showElementsTab() && tab() === 'elementos' && pricing(); as p) {
+    @if (tab() === 'elementos' && pricing(); as p) {
       <div class="calc-layout">
         <div>
+          <div class="message-strip" style="margin-bottom:16px">
+            <div class="k"><app-icon name="templates" /> Presupuesto y Desglose de Materiales</div>
+            <p>Listado valorado agrupado por categorías comerciales. Puedes ajustar cantidades, precios o agregar más ítems directamente desde el catálogo maestro.</p>
+          </div>
+
           @for (cat of cats; track cat) {
             @let items = q.elements.filter(e => e.cat === cat);
             <div class="card cat-card">
@@ -339,11 +531,16 @@
               }
             </div>
           }
-          @if (canFinalize()) {
-            <div class="actions-row" style="justify-content:flex-start">
-              <button class="btn btn-primary" type="button" (click)="workspace.finalizeQuote(q.id)"><app-icon name="finalize" /> Finalizar cotización</button>
-            </div>
-          }
+          <div class="actions-row" style="justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--em-line)">
+            @if (canFinalize()) {
+              <button class="btn btn-secondary" type="button" (click)="workspace.finalizeQuote(q.id)"><app-icon name="finalize" /> Finalizar cotización</button>
+            } @else {
+              <div></div>
+            }
+            <button class="btn btn-primary" type="button" (click)="setTab(WorkspaceTab.Reajuste)" style="font-weight:700">
+              Continuar a Reajustes de Margen ➔
+            </button>
+          </div>
         </div>
         <app-investment-summary [pricing]="p" [iva]="iva()" [margenMin]="q.margenMin" />
       </div>
@@ -385,11 +582,6 @@
             <div class="inv-row"><span>Real acumulado</span><span>{{ slaView()?.cycleLabel }}</span></div>
             <div class="inv-row"><span>Vendedor</span><span>{{ q.vendedor || '—' }}</span></div>
             <div class="inv-row"><span>Ingeniero</span><span>{{ q.ingeniero || '—' }}</span></div>
-            @if (!q.ingeniero) {
-              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px" type="button" (click)="workspace.takeRequest(q.id)">
-                <app-icon name="take" /> Tomar solicitud
-              </button>
-            }
           </div>
         </div>
 
@@ -412,9 +604,31 @@
                 <span class="num">{{ hours(s.meta) }}</span>
                 <span class="num" [style.color]="(s.desvio ?? 0) > 0 ? '#e11d48' : 'inherit'">{{ desvioLabel(s.desvio) }}</span>
                 <div><span class="status" [class.st-cálculos]="s.activa" [class.st-enviada]="s.done">{{ stageStatus(s) }}</span></div>
-                <div>
+                <div style="display:flex;align-items:center;justify-content:flex-end">
                   @if (s.activa) {
-                    <button class="btn btn-sm btn-primary" type="button" (click)="closeCurrentStage(s.meta)"><app-icon name="check" size="sm" /> Cerrar</button>
+                    <div style="display:inline-flex;align-items:center;gap:4px">
+                      <input
+                        class="input num"
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        style="width:56px;height:26px;padding:2px 4px;font-size:12px;text-align:center"
+                        [ngModel]="getActiveHours(s.meta)"
+                        (ngModelChange)="setStageInputHours(+$event)"
+                        placeholder="Horas"
+                        title="Horas reales trabajadas"
+                      />
+                      <span class="muted" style="font-size:11px">h</span>
+                      <button
+                        class="btn btn-sm btn-primary"
+                        type="button"
+                        style="height:26px;padding:0 8px;font-size:11.5px"
+                        (click)="confirmCloseStage(s.meta)"
+                        title="Registrar horas y avanzar etapa"
+                      >
+                        <app-icon name="check" size="sm" /> Cerrar
+                      </button>
+                    </div>
                   }
                 </div>
               </div>
@@ -436,14 +650,9 @@
       <div class="calc-layout">
         <div>
           @if (isEngineeringUnassigned()) {
-            <div class="message-strip warn" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-              <div style="flex:1;min-width:280px">
-                <div class="k"><app-icon name="take" /> Modo Informativo — Reajustes Comerciales</div>
-                <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para registrar reajustes comerciales, primero debes tomar la solicitud.</p>
-              </div>
-              <button class="btn btn-primary" type="button" (click)="take()" style="box-shadow:0 4px 14px rgba(2,132,199,0.35);flex-shrink:0">
-                <app-icon name="take" /> Tomar solicitud para editar
-              </button>
+            <div class="message-strip warn" style="margin-bottom:16px">
+              <div class="k"><app-icon name="info" /> Modo Informativo — Reajustes Comerciales</div>
+              <p style="margin-top:4px">Esta solicitud se encuentra en la bandeja técnica sin asignar. Para registrar reajustes comerciales, primero debes tomar la solicitud desde el botón superior.</p>
             </div>
           }
 

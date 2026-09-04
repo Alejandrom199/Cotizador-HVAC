@@ -7,11 +7,12 @@ import { QuoteWorkspaceService } from '@app/application/quote-workspace.service'
 import { ProductCategory } from '@app/domain/enums/product-category.enum';
 import { stockClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-quote-catalog-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './quote-catalog-page.html',
 })
 export class QuoteCatalogPage {
@@ -27,6 +28,15 @@ export class QuoteCatalogPage {
         this.route.parent?.snapshot.paramMap.get('id') ?? this.route.snapshot.paramMap.get('id') ?? '',
     },
   );
+
+  readonly breadcrumbs = computed<BreadcrumbItem[]>(() => {
+    const q = this.workspace.quote(this.quoteId());
+    return [
+      { label: 'Cotizaciones', url: '/solicitudes' },
+      { label: q ? q.code : 'Cotización', url: ['/cotizaciones', this.quoteId()] },
+      { label: `Catálogo de ${this.cat()}` },
+    ];
+  });
 
   readonly cat = signal<ProductCategory>(
     (this.route.snapshot.queryParamMap.get('cat') as ProductCategory) || ProductCategory.Insumos,

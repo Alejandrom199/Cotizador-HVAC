@@ -61,6 +61,7 @@ export class FontAwesomeIconAdapter implements IconAdapter {
     install: 'fa-solid fa-fan',
     maintain: 'fa-solid fa-wrench',
     elements: 'fa-solid fa-layer-group',
+    ducts: 'fa-solid fa-wind',
     check: 'fa-solid fa-check',
     cancel: 'fa-solid fa-xmark',
     money: 'fa-solid fa-dollar-sign',

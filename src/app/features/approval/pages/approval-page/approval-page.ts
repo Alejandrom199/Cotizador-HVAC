@@ -6,14 +6,16 @@ import { WorkspaceTab } from '@app/domain/enums';
 import { Quote } from '@app/domain/models/quote.model';
 import { statusClass } from '@app/shared/ui/presentation';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 @Component({
   selector: 'app-approval-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, Breadcrumb],
   templateUrl: './approval-page.html',
 })
 export class ApprovalPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Aprobaciones de Margen' }];
   private readonly workspace = inject(QuoteWorkspaceService);
   private readonly router = inject(Router);
   readonly statusClass = statusClass;

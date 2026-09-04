@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { QuoteWorkspaceService } from '@app/application/quote-workspace.service';
 import { DiscountCategory } from '@app/domain/enums';
 import { Icon } from '@app/shared/ui/icon';
+import { Breadcrumb, BreadcrumbItem } from '@app/shared/ui/breadcrumb';
 
 interface EditableParam {
   category: DiscountCategory;
@@ -15,10 +16,11 @@ interface EditableParam {
 @Component({
   selector: 'app-discount-settings-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon],
+  imports: [FormsModule, Icon, Breadcrumb],
   templateUrl: './discount-settings-page.html',
 })
 export class DiscountSettingsPage {
+  readonly breadcrumbs: BreadcrumbItem[] = [{ label: 'Parámetros & Descuentos' }];
   readonly workspace = inject(QuoteWorkspaceService);
 
   readonly params = signal<EditableParam[]>(

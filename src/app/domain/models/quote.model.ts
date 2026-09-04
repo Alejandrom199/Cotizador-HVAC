@@ -1,6 +1,7 @@
 import { Priority } from '../enums/priority.enum';
 import { QuoteKind } from '../enums/quote-kind.enum';
 import { QuoteStatus } from '../enums/quote-status.enum';
+import { DuctSegment } from './duct-segment.model';
 import { QuoteLine } from './quote-line.model';
 import { QuoteAttachment, QuoteLogEntry } from './quote-log.model';
 import { Room } from './room.model';
@@ -34,4 +35,5 @@ export interface Quote {
   log: QuoteLogEntry[];
   observaciones?: string;
   adjuntos?: QuoteAttachment[];
+  ductSegments?: DuctSegment[];
 }
